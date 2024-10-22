@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit OD</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        label {
+            padding: 8px 12px;
+            cursor: pointer;
+            display: block;
+        }
+        input[type="checkbox"] {
+            margin-right: 8px;
+        }
+        form {
+            margin-top: 20px;
+        }
+    </style>
+    <script>
+        function updateSelectedTeachers() {
+            const checkboxes = document.querySelectorAll('input[name="teachers"]:checked');
+            const button = document.querySelector('.dropdown button');
+            const selectedTeachers = Array.from(checkboxes).map(checkbox => checkbox.value);
+            button.innerHTML = selectedTeachers.length > 0 ? selectedTeachers.join(', ') : 'Select Teachers';
+        }
+    </script>
+</head>
+<body>
+
+<h2>Submit Your OD</h2>
+<form action="/submit_od" method="POST">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required><br><br>
+    
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required><br><br>
+
+    <label for="od_reason">Reason for OD:</label>
+    <textarea id="od_reason" name="od_reason" rows="4" cols="50" required></textarea><br><br>
+    
+    <h2>Concerned Teachers</h2>
+    <div class="dropdown">
+        <button type="button">Select Teachers</button>
+        <div class="dropdown-content">
+            <label><input type="checkbox" name="teachers" value="Mrs. Kalpana Patel" onclick="updateSelectedTeachers()"> HOD first year</label>
+            <label><input type="checkbox" name="teachers" value="Mrs. Sandhya Rani Verma" onclick="updateSelectedTeachers()"> Class Mentor</label>
+            <label><input type="checkbox" name="teachers" value="Mr. Nishant Srivastava" onclick="updateSelectedTeachers()"> Programming</label>
+            <label><input type="checkbox" name="teachers" value="Mrs. Pallavi Jain" onclick="updateSelectedTeachers()"> Chemistry</label>
+            <label><input type="checkbox" name="teachers" value="Mr. Santosh Rai" onclick="updateSelectedTeachers()"> Philosophy</label>
+            <label><input type="checkbox" name="teachers" value="Mr. Vipin Kumar Verma" onclick="updateSelectedTeachers()"> Mathematics</label>
+            <label><input type="checkbox" name="teachers" value="Mr. Maniram Kumar" onclick="updateSelectedTeachers()"> Graphics</label>
+            <label><input type="checkbox" name="teachers" value="Mrs. Sonia Pal" onclick="updateSelectedTeachers()"> Yoga</label>
+            <label><input type="checkbox" name="teachers" value="Mrs. Shweta Gupta" onclick="updateSelectedTeachers()"> PDM</label>
+            <label><input type="checkbox" name="teachers" value="Mrs. Kamakshi Saksena" onclick="updateSelectedTeachers()"> Biology</label>
+        </div>
+    </div>
+
+    <br><br>
+    <input type="submit" value="Submit">
+</form>
+
+</body>
+</html>

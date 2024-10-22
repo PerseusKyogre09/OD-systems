@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Register</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -20,33 +20,26 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 300px;
         }
-        .error {
-            color: red;
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Login</h2>
-        <form action="/login" method="POST">
+        <h2>Register</h2>
+        <form action="/register" method="POST">
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" required>
             <br><br>
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required>
             <br><br>
-            <input type="submit" value="Login">
+            <label for="role">Role:</label>
+            <select id="role" name="role" required>
+                <option value="student">Student</option>
+                <option value="teacher">Teacher</option>
+            </select>
+            <br><br>
+            <input type="submit" value="Register">
         </form>
-        <p>Don't have an account? <a href="/register">Register here</a></p>
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <ul class="error">
-                {% for message in messages %}
-                    <li>{{ message }}</li>
-                {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
     </div>
 </body>
 </html>
