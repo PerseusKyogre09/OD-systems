@@ -68,9 +68,9 @@ def login():
         else:
             flash('Invalid email or password')
     
-    return render_template('index.html')
+    return render_template('login.html')
 
-@app.route('/register', methods=['POST'])
+@app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         email = request.form['email']
@@ -90,6 +90,8 @@ def register():
         flash('Registration successful! Please log in.')
         return redirect(url_for('login'))
 
+    return render_template('register.html')
+
 @app.route('/student_dashboard')
 @login_required
 def student_dashboard():
@@ -98,7 +100,10 @@ def student_dashboard():
 @app.route('/teacher_dashboard')
 @login_required
 def teacher_dashboard():
-    return render_template('teacher_dashboard.html')
+    query = "SELECT id, name, email, od_reason FROM od_requests WHERE approved IS NULL"
+    cursor.execute(query)
+    ods = cursor.fetchall()
+    return render_template('teacher_dashboard.html', ods=ods)
 
 @app.route('/submit_od', methods=['GET', 'POST'])
 @login_required
@@ -109,21 +114,26 @@ def submit_od():
         od_reason = request.form['od_reason']
         teachers = request.form.getlist('teachers')
 
+        # Insert OD request into the database
+        query = "INSERT INTO od_requests (name, email, od_reason, approved) VALUES (%s, %s, %s, NULL)"
+        cursor.execute(query, (name, email, od_reason))
+        od_id = cursor.lastrowid  # Get the ID of the last inserted OD request
+
         # Send email for approval
         for teacher_email in teachers:
-            send_email(teacher_email, name, od_reason, email)
+            send_email(teacher_email, name, od_reason, email, od_id)
 
         flash('OD submitted successfully! The concerned teachers have been notified.')
         return redirect(url_for('submit_od'))
     
     return render_template('submit_od.html')
 
-def send_email(to_email, name, od_reason, student_email):
+def send_email(to_email, name, od_reason, student_email, od_id):
     sender_email = "your_email@gmail.com"
     sender_password = "your_email_password"
     
     subject = "OD Verification Request"
-    body = f"Dear Teacher,\n\nStudent {name} ({student_email}) has submitted an OD for the following reason: {od_reason}.\n\nPlease verify the OD.\n\nBest Regards,\nOD System"
+    body = f"Dear Teacher,\n\nStudent {name} ({student_email}) has submitted an OD for the following reason: {od_reason}.\nPlease verify the OD by clicking the following link:\n\nhttp://localhost:5000/approve_od/{od_id} or http://localhost:5000/reject_od/{od_id}.\n\nBest Regards,\nOD System"
     
     msg = MIMEMultipart()
     msg['From'] = sender_email
@@ -135,6 +145,30 @@ def send_email(to_email, name, od_reason, student_email):
         server.starttls()
         server.login(sender_email, sender_password)
         server.send_message(msg)
+
+@app.route('/approve_od/<int:od_id>', methods=['POST'])
+@login_required
+def approve_od(od_id):
+    query = "UPDATE od_requests SET approved = 'yes' WHERE id = %s"
+    cursor.execute(query, (od_id,))
+    conn.commit()
+    flash('OD approved successfully!')
+    return redirect(url_for('teacher_dashboard'))
+
+@app.route('/reject_od/<int:od_id>', methods=['POST'])
+@login_required
+def reject_od(od_id):
+    query = "UPDATE od_requests SET approved = 'no' WHERE id = %s"
+    cursor.execute(query, (od_id,))
+    conn.commit()
+    flash('OD rejected successfully!')
+    return redirect(url_for('teacher_dashboard'))
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
 
 if __name__ == '__main__':
     app.run(debug=True)
