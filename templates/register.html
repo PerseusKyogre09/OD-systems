@@ -11,14 +11,52 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #f0f0f0;
+            background-color: #f0f2f5; /* Light background */
+            margin: 0;
         }
         .container {
             background-color: white;
-            padding: 20px;
+            padding: 30px; /* Increased padding for a more spacious feel */
+            border-radius: 10px; /* Rounded corners */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            width: 320px; /* Fixed width for consistency */
+            box-sizing: border-box; /* Include padding in width */
+        }
+        h2 {
+            text-align: center;
+            color: #333; /* Darker text for contrast */
+            margin-bottom: 20px; /* Space below the heading */
+        }
+        label {
+            margin-bottom: 5px;
+            display: block;
+            color: #555; /* Lighter text color */
+        }
+        input[type="email"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 12px; /* Increased padding for better touch area */
+            margin: 10px 0; /* Consistent margin */
+            border: 1px solid #ccc;
             border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            font-size: 16px; /* Font size for readability */
+            box-sizing: border-box; /* Include padding in width */
+        }
+        input[type="submit"] {
+            background-color: #007bff; /* Bootstrap primary color */
+            color: white;
+            border: none;
+            padding: 12px; /* Increased padding for button */
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s; /* Smooth hover transition */
+            width: 100%; /* Full width for submit button */
+            margin-top: 10px; /* Space above the button */
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3; /* Darker shade on hover */
         }
     </style>
 </head>
@@ -28,16 +66,16 @@
         <form action="/register" method="POST">
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" required>
-            <br><br>
+            
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required>
-            <br><br>
+            
             <label for="role">Role:</label>
             <select id="role" name="role" required>
                 <option value="student">Student</option>
                 <option value="teacher">Teacher</option>
             </select>
-            <br><br>
+            
             <input type="submit" value="Register">
         </form>
     </div>

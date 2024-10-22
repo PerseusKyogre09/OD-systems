@@ -129,8 +129,8 @@ def submit_od():
     return render_template('submit_od.html')
 
 def send_email(to_email, name, od_reason, student_email, od_id):
-    sender_email = "your_email@gmail.com"
-    sender_password = "your_email_password"
+    sender_email = "mail here"
+    sender_password = "password"
     
     subject = "OD Verification Request"
     body = f"Dear Teacher,\n\nStudent {name} ({student_email}) has submitted an OD for the following reason: {od_reason}.\nPlease verify the OD by clicking the following link:\n\nhttp://localhost:5000/approve_od/{od_id} or http://localhost:5000/reject_od/{od_id}.\n\nBest Regards,\nOD System"
@@ -149,8 +149,9 @@ def send_email(to_email, name, od_reason, student_email, od_id):
 @app.route('/approve_od/<int:od_id>', methods=['POST'])
 @login_required
 def approve_od(od_id):
-    query = "UPDATE od_requests SET approved = 'yes' WHERE id = %s"
-    cursor.execute(query, (od_id,))
+    # Update query for approving OD
+    query = "UPDATE od_requests SET approved = %s WHERE id = %s"
+    cursor.execute(query, (1, od_id))  # Use 1 for 'approved'
     conn.commit()
     flash('OD approved successfully!')
     return redirect(url_for('teacher_dashboard'))
@@ -158,8 +159,9 @@ def approve_od(od_id):
 @app.route('/reject_od/<int:od_id>', methods=['POST'])
 @login_required
 def reject_od(od_id):
-    query = "UPDATE od_requests SET approved = 'no' WHERE id = %s"
-    cursor.execute(query, (od_id,))
+    # Update query for rejecting OD
+    query = "UPDATE od_requests SET approved = %s WHERE id = %s"
+    cursor.execute(query, (0, od_id))  # Use 0 for 'rejected'
     conn.commit()
     flash('OD rejected successfully!')
     return redirect(url_for('teacher_dashboard'))

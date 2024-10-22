@@ -10,12 +10,64 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f2f5; /* Light background */
+            margin: 0;
         }
         form {
+            background-color: #ffffff; /* White form background */
             border: 1px solid #ccc;
-            padding: 20px;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            width: 320px; /* Fixed width for consistency */
+            box-sizing: border-box; /* Include padding in width */
+        }
+        h2 {
+            text-align: center;
+            color: #333; /* Darker text for contrast */
+            margin-bottom: 20px; /* Space below the heading */
+        }
+        label {
+            margin-bottom: 5px;
+            display: block;
+            color: #555; /* Lighter text color */
+        }
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px; /* Increased padding for better touch area */
+            margin: 10px 0; /* Consistent margin */
+            border: 1px solid #ccc;
             border-radius: 5px;
+            font-size: 16px; /* Font size for readability */
+            box-sizing: border-box; /* Include padding in width */
+        }
+        input[type="submit"] {
+            background-color: #007bff; /* Bootstrap primary color */
+            color: white;
+            border: none;
+            padding: 12px; /* Increased padding for button */
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s; /* Smooth hover transition */
+            width: 100%; /* Full width for submit button */
+            margin-top: 10px; /* Space above the button */
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3; /* Darker shade on hover */
+        }
+        p {
+            text-align: center;
+            margin-top: 15px; /* Space above the paragraph */
+        }
+        #registerLink {
+            color: #007bff; /* Link color */
+            text-decoration: none; /* No underline */
+        }
+        #registerLink:hover {
+            text-decoration: underline; /* Underline on hover */
         }
     </style>
 </head>
@@ -24,10 +76,10 @@
 <form id="loginForm" action="/login" method="POST">
     <h2>Login</h2>
     <label for="email">Email:</label>
-    <input type="email" id="email" name="email" required><br><br>
+    <input type="email" id="email" name="email" required>
     
     <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required><br><br>
+    <input type="password" id="password" name="password" required>
 
     <input type="submit" value="Login">
     <p><a href="/register" id="registerLink">Not registered? Click here to register.</a></p>

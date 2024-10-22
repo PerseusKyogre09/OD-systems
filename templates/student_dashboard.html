@@ -6,34 +6,101 @@
     <title>Submit OD</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4; /* Consistent light background */
+            color: #333; /* Dark text color */
         }
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #f9f9f9;
-            min-width: 160px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 1;
-        }
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
-        label {
-            padding: 8px 12px;
-            cursor: pointer;
-            display: block;
-        }
-        input[type="checkbox"] {
-            margin-right: 8px;
+        h2 {
+            text-align: center;
+            color: #4CAF50; /* Green color for headings */
         }
         form {
-            margin-top: 20px;
+            max-width: 600px; /* Limit form width */
+            margin: 20px auto; /* Center the form */
+            background: white; /* White background for form */
+            padding: 20px; /* Padding inside the form */
+            border-radius: 8px; /* Rounded corners */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
+        }
+        label {
+            display: block; /* Labels on new lines */
+            margin: 10px 0 5px; /* Space around labels */
+            font-weight: bold; /* Bold labels */
+        }
+        input[type="text"],
+        input[type="email"],
+        textarea,
+        select {
+            width: 100%; /* Full width input fields */
+            padding: 10px; /* Padding for input fields */
+            margin-bottom: 15px; /* Space below input fields */
+            border: 1px solid #ccc; /* Light border */
+            border-radius: 4px; /* Rounded corners */
+            box-sizing: border-box; /* Include padding in width */
+            transition: border-color 0.3s; /* Smooth border color transition */
+        }
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        textarea:focus,
+        select:focus {
+            border-color: #4CAF50; /* Green border on focus */
+            outline: none; /* Remove default outline */
+        }
+        .dropdown {
+            position: relative; /* For dropdown positioning */
+            display: inline-block; /* Inline-block for dropdown */
+            width: 100%; /* Full width for dropdown */
+        }
+        .dropdown button {
+            width: 100%; /* Full width button */
+            padding: 10px; /* Button padding */
+            border: 1px solid #ccc; /* Light border */
+            border-radius: 4px; /* Rounded corners */
+            background-color: #f9f9f9; /* Light background */
+            text-align: left; /* Left align text */
+            cursor: pointer; /* Pointer cursor */
+            transition: background-color 0.3s; /* Smooth background transition */
+        }
+        .dropdown button:hover {
+            background-color: #e0e0e0; /* Darker background on hover */
+        }
+        .dropdown-content {
+            display: none; /* Hidden by default */
+            position: absolute; /* Absolute positioning */
+            background-color: #fff; /* White background */
+            min-width: 100%; /* Minimum width of dropdown */
+            border: 1px solid #ccc; /* Light border */
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); /* Shadow for dropdown */
+            z-index: 1; /* Ensure dropdown is above other content */
+            border-radius: 4px; /* Rounded corners */
+        }
+        .dropdown:hover .dropdown-content {
+            display: block; /* Show dropdown on hover */
+        }
+        .dropdown-content label {
+            padding: 8px 12px; /* Padding for dropdown items */
+            cursor: pointer; /* Pointer cursor */
+            display: flex; /* Flex for alignment */
+            align-items: center; /* Center items vertically */
+        }
+        .dropdown-content input[type="checkbox"] {
+            margin-right: 8px; /* Space between checkbox and label */
+        }
+        input[type="submit"] {
+            background-color: #4CAF50; /* Green background for submit button */
+            color: white; /* White text */
+            border: none; /* No border */
+            padding: 10px; /* Padding for button */
+            border-radius: 4px; /* Rounded corners */
+            cursor: pointer; /* Pointer cursor */
+            font-size: 16px; /* Larger text */
+            transition: background-color 0.3s; /* Smooth background transition */
+            width: 100%; /* Full width for submit button */
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049; /* Darker green on hover */
         }
     </style>
     <script>
@@ -48,15 +115,33 @@
 <body>
 
 <h2>Submit Your OD</h2>
+<img src="static/srm.jpg" alt="Description of the image" style="display: block; margin: 0 auto; max-width: 50%; height: auto;">
+
 <form action="/submit_od" method="POST">
     <label for="name">Name:</label>
-    <input type="text" id="name" name="name" required><br><br>
+    <input type="text" id="name" name="name" required>
     
     <label for="email">Email:</label>
-    <input type="email" id="email" name="email" required><br><br>
+    <input type="email" id="email" name="email" required>
+
+    <label for="year">Year:</label>
+    <select id="year" name="year" required>
+        <option value="">Select Year</option>
+        <option value="1st year">1st Year</option>
+        <option value="2nd year">2nd Year</option>
+        <option value="3rd year">3rd Year</option>
+        <option value="4th year">4th Year</option>
+    </select>
+
+    <label for="branch">Branch and Section:</label>
+    <select id="branch" name="branch" required>
+        <option value="">Select Branch</option>
+        <option value="Core B">Core B</option>
+        <option value="AIML A">AIML A</option>
+    </select>
 
     <label for="od_reason">Reason for OD:</label>
-    <textarea id="od_reason" name="od_reason" rows="4" cols="50" required></textarea><br><br>
+    <textarea id="od_reason" name="od_reason" rows="4" required></textarea>
     
     <h2>Concerned Teachers</h2>
     <div class="dropdown">
@@ -75,7 +160,7 @@
         </div>
     </div>
 
-    <br><br>
+    <br>
     <input type="submit" value="Submit">
 </form>
 
