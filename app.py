@@ -124,14 +124,14 @@ def submit_od():
             send_email(teacher_email, name, od_reason, email, od_id)
 
         flash('OD submitted successfully! The concerned teachers have been notified.')
-        return redirect(url_for('submit_od'))
     
-    return render_template('submit_od.html')
+    return render_template('student_dashboard.html')
 
 def send_email(to_email, name, od_reason, student_email, od_id):
-    sender_email = "mail here"
-    sender_password = "password"
-    
+    sender_email = "email"
+    sender_password = "app specific pass from google"
+    to_email = "email"
+
     subject = "OD Verification Request"
     body = f"Dear Teacher,\n\nStudent {name} ({student_email}) has submitted an OD for the following reason: {od_reason}.\nPlease verify the OD by clicking the following link:\n\nhttp://localhost:5000/approve_od/{od_id} or http://localhost:5000/reject_od/{od_id}.\n\nBest Regards,\nOD System"
     
@@ -171,6 +171,11 @@ def reject_od(od_id):
 def logout():
     logout_user()
     return redirect(url_for('login'))
+
+# Route to display team.html page
+@app.route('/team')
+def team():
+    return render_template('team.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
