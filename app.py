@@ -5,6 +5,10 @@ import pymysql
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
@@ -128,19 +132,47 @@ def submit_od():
     return render_template('student_dashboard.html')
 
 def send_email(to_email, name, od_reason, student_email, od_id):
-    sender_email = "email"
-    sender_password = "app specific pass from google"
-    to_email = "email"
+    sender_email = os.getenv('EMAIL_USER')
+    sender_password = os.getenv('EMAIL_PASS')
+    to_email = os.getenv('RECIEVE')
 
     subject = "OD Verification Request"
-    body = f"Dear Teacher,\n\nStudent {name} ({student_email}) has submitted an OD for the following reason: {od_reason}.\nPlease verify the OD by clicking the following link:\n\nhttp://localhost:5000/approve_od/{od_id} or http://localhost:5000/reject_od/{od_id}.\n\nBest Regards,\nOD System"
+    # HTML body with styling and button
+    body = f"""
+    <html>
+    <body>
+        <p>Dear Teacher,</p>
+        <p>Student <strong>{name}</strong> (<a href="mailto:{student_email}">{student_email}</a>) has submitted an OD for the following reason:</p>
+        <blockquote>{od_reason}</blockquote>
+        <p>Please verify the OD by clicking the button below:</p>
+        <p>
+            <a href="http://localhost:5000/teacher_dashboard" style="
+                display: inline-block;
+                padding: 10px 20px;
+                font-size: 16px;
+                color: #fff;
+                background-color: #007BFF;
+                text-decoration: none;
+                border-radius: 5px;
+                margin-top: 20px;">
+                Verify OD
+            </a>
+        </p>
+        <br>
+        <p>Best Regards,<br>OD System</p>
+    </body>
+    </html>
+    """
     
-    msg = MIMEMultipart()
+    msg = MIMEMultipart("alternative")
     msg['From'] = sender_email
     msg['To'] = to_email
     msg['Subject'] = subject
-    msg.attach(MIMEText(body, 'plain'))
 
+    # Attach HTML content
+    msg.attach(MIMEText(body, "html"))
+
+    # Send the email
     with smtplib.SMTP('smtp.gmail.com', 587) as server:
         server.starttls()
         server.login(sender_email, sender_password)
