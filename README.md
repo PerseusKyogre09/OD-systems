@@ -13,7 +13,7 @@ This project was created by **Team Matrix**:
 ## About the Project
 This project was a collective effort for **B Inventors**, a hackathon organized by SRM Connect and BitBucks. We worked hard during this 24-hour hackathon to create a functional and efficient OD management system.
 
-Please see the [LICENSE](#license) for terms and conditions.
+Please see the LICENSE.md for terms and conditions.
 
 ## Features
 1. User Authentication: Registration, login, and logout functionalities with role-based access control for students and teachers.
