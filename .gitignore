@@ -1,1 +1,4 @@
-
+# Secret
+.env
+venv
+__pycache__
