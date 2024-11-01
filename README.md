@@ -1,12 +1,19 @@
 # Online OD (On-Duty) Management System
-<p> This project is an Online OD (On-Duty) Management System built with Flask. It enables students to submit OD requests, which can be reviewed and approved or rejected by teachers. The system includes features like user authentication, email notifications, and separate dashboards for students and teachers. </p><br>
-<p> This was a project by Team Matrix: <br>
-**Team Leader**: [Pradeepto Pal](https://github.com/PerseusKyogre09)
-**Frontend Dev**: [Shivaditya .](https://github.com/SHIVADITYA2005)
-**Database Handler**: [Vansh Rattan](https://github.com/rattanvansh)
-</p><br>
+
+This project is an Online OD (On-Duty) Management System built with Flask. It enables students to submit OD requests, which can be reviewed and approved or rejected by teachers. The system includes features like user authentication, email notifications, and separate dashboards for students and teachers.
+
+## Team Matrix
+This project was created by **Team Matrix**:
+- **Team Leader**: [Pradeepto Pal](https://github.com/PerseusKyogre09)
+- **Frontend Developer**: [Shivaditya](https://github.com/SHIVADITYA2005)
+- **Database Handler**: [Vansh Rattan](https://github.com/rattanvansh)
+
 ![Team Matrix](https://imgur.com/Xe6GCKB.png)
-<br><p>This project was a collective effort for **B Inventors**, a hackathon organised by SRM Connect and BitBucks. We worked hard on this 24 hour hackathon. Please Read License(#LICENSE).</p>
+
+## About the Project
+This project was a collective effort for **B Inventors**, a hackathon organized by SRM Connect and BitBucks. We worked hard during this 24-hour hackathon to create a functional and efficient OD management system.
+
+Please see the [LICENSE](#license) for terms and conditions.
 
 ## Features
 1. User Authentication: Registration, login, and logout functionalities with role-based access control for students and teachers.
