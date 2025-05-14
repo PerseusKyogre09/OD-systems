@@ -98,9 +98,8 @@
                     <p class="mt-2 text-indigo-100">Welcome, Prof. {{ current_user.name }}</p>
                 </div>
                 <div class="mt-4 md:mt-0 flex items-center">
-                    <span class="college-badge college-badge-secondary mr-2">Faculty</span>
-                    <span class="text-sm bg-white bg-opacity-20 px-3 py-1 rounded-full">
-                        <i class="fas fa-calendar-alt mr-1"></i> {{ today.strftime('%b %d, %Y') }}
+                    <span class="college-badge college-badge-secondary mr-2">Faculty</span>                    <span class="text-sm bg-white bg-opacity-20 px-3 py-1 rounded-full">
+                        <i class="fas fa-calendar-alt mr-1"></i> {{ today }}
                     </span>
                 </div>
             </div>
@@ -275,13 +274,11 @@
                                     {{ od.description[:30] }}{% if od.description|length > 30 %}...{% endif %}
                                 </div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
-                                    {{ od.date.strftime('%d %b, %Y') }}
+                            <td class="px-6 py-4 whitespace-nowrap">                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
+                                    {{ od.date }}
                                 </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                {{ od.created_at.strftime('%b %d, %H:%M') }}
+                            </td>                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                {{ od.created_at }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">                                <div class="flex space-x-2 justify-end">
                                     <a href="{{ url_for('view_request', request_id=od.id) }}" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">

@@ -132,11 +132,10 @@
                         {{ request.student_name[0] }}
                     </div>
                     <div class="ml-4">
-                        <h2 class="text-lg font-bold text-gray-900 dark:text-white">{{ request.student_name }}</h2>
-                        <div class="text-sm text-gray-500 dark:text-gray-400 flex items-center">
+                        <h2 class="text-lg font-bold text-gray-900 dark:text-white">{{ request.student_name }}</h2>                        <div class="text-sm text-gray-500 dark:text-gray-400 flex items-center">
                             <i class="fas fa-envelope mr-1"></i> {{ request.email }}
                             <span class="mx-2">•</span>
-                            <i class="fas fa-calendar-alt mr-1"></i> Submitted on {{ request.created_at.strftime('%b %d, %Y') }}
+                            <i class="fas fa-calendar-alt mr-1"></i> Submitted on {{ request.created_at }}
                         </div>
                     </div>
                 </div>
@@ -165,9 +164,8 @@
                             <div class="flex items-center mb-2">
                                 <i class="fas fa-calendar-alt text-indigo-600 dark:text-indigo-400 mr-2"></i>
                                 <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Absence Date</span>
-                            </div>
-                            <div class="ml-6 text-base font-medium text-gray-900 dark:text-white">
-                                {{ request.date.strftime('%d %B, %Y') if request.date is defined and request.date else request.date }}
+                            </div>                            <div class="ml-6 text-base font-medium text-gray-900 dark:text-white">
+                                {{ request.date }}
                             </div>
                         </div>
 
@@ -217,18 +215,16 @@
                     </h3>
                     
                     <div class="timeline-item">
-                        <div class="font-medium text-gray-900 dark:text-white">Request Submitted</div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400">
-                            {{ request.created_at.strftime('%d %B, %Y at %H:%M') }}
+                        <div class="font-medium text-gray-900 dark:text-white">Request Submitted</div>                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                            {{ request.created_at }}
                         </div>
                     </div>
                     
                     <div class="timeline-item">
                         <div class="font-medium text-gray-900 dark:text-white">
                             Request {{ request.status }}
-                        </div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400">
-                            {{ request.decided_at.strftime('%d %B, %Y at %H:%M') if request.decided_at is defined and request.decided_at else request.decided_at }}
+                        </div>                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                            {{ request.decided_at }}
                         </div>
                         <div class="mt-1 text-sm">
                             <span class="font-medium">Decision by:</span> 
@@ -284,9 +280,8 @@
                             </div>
                             <div class="flex-1 bg-gray-50 dark:bg-gray-700 rounded-lg px-4 py-3 shadow-sm">
                                 <div class="flex justify-between items-start">
-                                    <span class="font-medium text-gray-900 dark:text-white">{{ comment.author }}</span>
-                                    <span class="text-xs text-gray-500 dark:text-gray-400">
-                                        {{ comment.created_at.strftime('%b %d, %H:%M') if comment.created_at is defined and comment.created_at else comment.created_at }}
+                                    <span class="font-medium text-gray-900 dark:text-white">{{ comment.author }}</span>                                    <span class="text-xs text-gray-500 dark:text-gray-400">
+                                        {{ comment.formatted_date if 'formatted_date' in comment else comment.created_at }}
                                     </span>
                                 </div>
                                 <div class="mt-1 text-sm text-gray-700 dark:text-gray-300">
