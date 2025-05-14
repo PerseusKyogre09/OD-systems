@@ -11,10 +11,15 @@ import os
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'
+app.secret_key = os.getenv('FLASK_SECRET_KEY')
 
 # Database connection
-conn = pymysql.connect(host='localhost', user='root', password='perseus', db='od_system_db')
+conn = pymysql.connect(
+    host=os.getenv('DB_HOST'),
+    user=os.getenv('DB_USER'),
+    password=os.getenv('DB_PASSWORD'),
+    db=os.getenv('DB_NAME')
+)
 cursor = conn.cursor()
 
 login_manager = LoginManager()
