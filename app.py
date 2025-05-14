@@ -203,13 +203,16 @@ def teacher_dashboard():
 
     # Get total actions (approved + rejected)
     cursor.execute("SELECT COUNT(*) FROM od_requests WHERE status IN ('Approved', 'Rejected')")
-    total_actions = cursor.fetchone()['COUNT(*)']
-
+    total_actions = cursor.fetchone()['COUNT(*)']    # Add today's date for the dashboard
+    from datetime import datetime
+    today = datetime.now()
+    
     return render_template('teacher_dashboard.html',
                          od_requests=od_requests,
                          pending_count=pending_count,
                          todays_count=todays_count,
-                         total_actions=total_actions)
+                         total_actions=total_actions,
+                         today=today)
 
 @app.route('/submit_od', methods=['GET', 'POST'])
 @login_required
