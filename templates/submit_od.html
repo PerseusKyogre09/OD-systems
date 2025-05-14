@@ -2,79 +2,241 @@
 
 {% block title %}Submit On-Duty Request{% endblock %}
 
+{% block extra_css %}
+<style>
+    .submit-container {
+        background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path fill="%231E40AF" fill-opacity="0.05" d="M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5z"></path></svg>');
+    }
+    
+    .form-header {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .form-header::after {
+        content: '';
+        position: absolute;
+        width: 210px;
+        height: 210px;
+        background-color: rgba(79, 70, 229, 0.1);
+        border-radius: 50%;
+        top: -120px;
+        right: -80px;
+        z-index: 1;
+    }
+    
+    .form-header::before {
+        content: '';
+        position: absolute;
+        width: 150px;
+        height: 150px;
+        background-color: rgba(30, 64, 175, 0.05);
+        border-radius: 50%;
+        bottom: -80px;
+        left: -60px;
+        z-index: 1;
+    }
+    
+    .input-icon-wrapper {
+        position: relative;
+    }
+    
+    .input-icon {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6B7280;
+        pointer-events: none;
+    }
+    
+    .form-step {
+        border-left: 4px solid #1E40AF;
+        padding-left: 1rem;
+        margin-bottom: 2rem;
+        position: relative;
+    }
+    
+    .form-step::before {
+        content: '';
+        position: absolute;
+        left: -10px;
+        top: 0;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background-color: #1E40AF;
+    }
+    
+    .form-step-number {
+        position: absolute;
+        left: -10px;
+        top: 0;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background-color: #1E40AF;
+        color: white;
+        font-size: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="min-h-screen py-12 sm:px-6 lg:px-8 bg-gray-100 dark:bg-gray-900" data-cue="fadeIn">
-    <div class="sm:mx-auto sm:w-full sm:max-w-2xl">
-        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Submit On-Duty Request
-        </h2>
-        <p class="mt-2 text-center text-sm text-gray-600">
-            Please fill in the details below
-        </p>
+<div class="min-h-screen py-12 sm:px-6 lg:px-8 bg-gray-100 dark:bg-gray-900 submit-container" data-aos="fade-in">
+    <div class="sm:mx-auto sm:w-full sm:max-w-3xl">
+        <div class="college-banner">
+            <h2 class="text-center text-lg font-semibold text-white">
+                ON-DUTY APPLICATION FORM
+            </h2>
+        </div>
+        
+        <div class="text-center mb-6">
+            <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white">
+                Submit On-Duty Request
+            </h2>
+            <p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+                Complete the form below to request academic leave
+            </p>
+        </div>
     </div>
 
-    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-2xl">
-        <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10" data-cue="slideUp">
-            <form method="POST" action="{{ url_for('submit_od') }}" class="space-y-6" enctype="multipart/form-data">
-                {{ form.csrf_token }}
+    <div class="sm:mx-auto sm:w-full sm:max-w-3xl">
+        <div class="college-card" data-aos="fade-up" data-aos-delay="200">
+            <div class="college-card-header form-header">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-file-alt text-indigo-600 dark:text-indigo-400"></i>
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Request Details</h3>
+                </div>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">All fields marked with * are required</p>
+            </div>
+            
+            <div class="college-card-body">
+                <form method="POST" action="{{ url_for('submit_od') }}" class="college-form space-y-8" enctype="multipart/form-data">
+                    {{ form.csrf_token }}
 
-                <div>
-                    {{ form.event_name.label(class="block text-sm font-medium text-gray-700") }}
-                    <div class="mt-1">
-                        {{ form.event_name(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", placeholder="Enter event name") }}
+                    <div class="form-step">
+                        <div class="form-step-number">1</div>
+                        <div class="form-group pt-1">
+                            {{ form.event_name.label(class="block text-sm font-medium text-gray-700 dark:text-gray-300") }}
+                            <span class="text-red-500">*</span>
+                            <div class="mt-1 input-icon-wrapper">
+                                <i class="fas fa-calendar-day input-icon"></i>
+                                {{ form.event_name(class="appearance-none block w-full pl-10 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white", placeholder="Enter the name of the event or activity") }}
+                            </div>
+                            {% if form.event_name.errors %}
+                                {% for error in form.event_name.errors %}
+                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
                     </div>
-                    {% if form.event_name.errors %}
-                        {% for error in form.event_name.errors %}
-                            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
-                        {% endfor %}
-                    {% endif %}
-                </div>
 
-                <div>
-                    {{ form.date.label(class="block text-sm font-medium text-gray-700") }}
-                    <div class="mt-1">
-                        {{ form.date(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", type="date") }}
+                    <div class="form-step">
+                        <div class="form-step-number">2</div>
+                        <div class="form-group pt-1">
+                            {{ form.date.label(class="block text-sm font-medium text-gray-700 dark:text-gray-300") }}
+                            <span class="text-red-500">*</span>
+                            <div class="mt-1 input-icon-wrapper">
+                                <i class="fas fa-calendar-alt input-icon"></i>
+                                {{ form.date(class="appearance-none block w-full pl-10 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white", type="date") }}
+                            </div>
+                            {% if form.date.errors %}
+                                {% for error in form.date.errors %}
+                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+                                {% endfor %}
+                            {% endif %}
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Select the date when you'll be absent from classes</p>
+                        </div>
                     </div>
-                    {% if form.date.errors %}
-                        {% for error in form.date.errors %}
-                            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
-                        {% endfor %}
-                    {% endif %}
-                </div>
 
-                <div>
-                    {{ form.description.label(class="block text-sm font-medium text-gray-700") }}
-                    <div class="mt-1">
-                        {{ form.description(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", rows="4", placeholder="Describe the reason for your OD request") }}
+                    <div class="form-step">
+                        <div class="form-step-number">3</div>
+                        <div class="form-group pt-1">
+                            {{ form.description.label(class="block text-sm font-medium text-gray-700 dark:text-gray-300") }}
+                            <span class="text-red-500">*</span>
+                            <div class="mt-1">
+                                {{ form.description(class="appearance-none block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white", rows="4", placeholder="Provide details about the event, competition, or reason for your OD request") }}
+                            </div>
+                            {% if form.description.errors %}
+                                {% for error in form.description.errors %}
+                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+                                {% endfor %}
+                            {% endif %}
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Include relevant details like venue, purpose, and organizing entity</p>
+                        </div>
                     </div>
-                    {% if form.description.errors %}
-                        {% for error in form.description.errors %}
-                            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
-                        {% endfor %}
-                    {% endif %}
-                </div>
 
-                <div>
-                    {{ form.document.label(class="block text-sm font-medium text-gray-700") }}
-                    <div class="mt-1">
-                        {{ form.document(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm") }}
+                    <div class="form-step">
+                        <div class="form-step-number">4</div>
+                        <div class="form-group pt-1">
+                            {{ form.document.label(class="block text-sm font-medium text-gray-700 dark:text-gray-300") }}
+                            <div class="mt-1">
+                                <div class="flex items-center justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-md">
+                                    <div class="space-y-1 text-center">
+                                        <i class="fas fa-file-upload mx-auto text-3xl text-gray-400"></i>
+                                        <div class="flex text-sm text-gray-600 dark:text-gray-400">
+                                            <label for="document" class="relative cursor-pointer bg-white dark:bg-gray-700 rounded-md font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 focus-within:outline-none">
+                                                <span>Upload a file</span>
+                                                {{ form.document(class="sr-only") }}
+                                            </label>
+                                            <p class="pl-1">or drag and drop</p>
+                                        </div>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                                            PDF, DOC, DOCX up to 5MB
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Upload invitation letter, event details, or any supporting documents</p>
+                            {% if form.document.errors %}
+                                {% for error in form.document.errors %}
+                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
                     </div>
-                    <p class="mt-1 text-xs text-gray-500">Upload any supporting documents (PDF, DOC)</p>
-                    {% if form.document.errors %}
-                        {% for error in form.document.errors %}
-                            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
-                        {% endfor %}
-                    {% endif %}
-                </div>
 
-                <div>
-                    <button type="submit"
-                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
-                        Submit Request
-                    </button>
-                </div>
-            </form>
+                    <div class="college-alert college-alert-info">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        <span class="text-sm">Your request will be reviewed by your faculty advisor. You'll receive notification when the status changes.</span>
+                    </div>
+
+                    <div>
+                        <button type="submit"
+                                class="btn-college-primary w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium">
+                            <i class="fas fa-paper-plane mr-2"></i> Submit Request
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize AOS (Animate On Scroll)
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+        
+        // Improve file input experience
+        const fileInput = document.getElementById('document');
+        const fileInputLabel = fileInput.nextElementSibling;
+        
+        fileInput.addEventListener('change', function(e) {
+            if (fileInput.files.length > 0) {
+                fileInputLabel.innerHTML = fileInput.files[0].name;
+            }
+        });
+    });
+</script>
 {% endblock %}

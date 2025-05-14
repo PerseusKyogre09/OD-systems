@@ -2,74 +2,136 @@
 
 {% block title %}Login - OD System{% endblock %}
 
+{% block extra_css %}
+<style>
+    .login-container {
+        background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path fill="%231E40AF" fill-opacity="0.05" d="M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5z"></path></svg>');
+    }
+    .university-emblem {
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        background-color: rgba(30, 64, 175, 0.03);
+        border-radius: 50%;
+        top: 20%;
+        right: -150px;
+        z-index: 0;
+    }
+    .university-emblem:before {
+        content: "";
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        background-color: rgba(30, 64, 175, 0.02);
+        border-radius: 50%;
+        top: 50px;
+        left: -100px;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8" data-cue="fadeIn">
+<div class="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 login-container relative pattern-dots" data-aos="fade-in">
+    <div class="university-emblem"></div>
+    
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Welcome back
+        <div class="college-banner">
+            <h2 class="text-center text-lg font-semibold text-white">
+                STUDENT PORTAL
+            </h2>
+        </div>
+        <h2 class="mt-2 text-center text-3xl font-extrabold text-gray-900 dark:text-gray-100">
+            Welcome back, student!
         </h2>
-        <p class="mt-2 text-center text-sm text-gray-600">
-            Sign in to your account
+        <p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+            Sign in to access your academic portal
         </p>
     </div>
 
     <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10" data-cue="slideUp">
-            <form method="POST" action="{{ url_for('login') }}" class="space-y-6">
-                {{ form.csrf_token }}
-                
-                <div>
-                    {{ form.email.label(class="block text-sm font-medium text-gray-700") }}
-                    <div class="mt-1">
-                        {{ form.email(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", placeholder="Enter your email") }}
+        <div class="college-card" data-aos="fade-up" data-aos-delay="200">
+            <div class="college-card-header">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Account Login</h3>
+            </div>
+            <div class="college-card-body">
+                <form method="POST" action="{{ url_for('login') }}" class="college-form space-y-6">
+                    {{ form.csrf_token }}
+                    
+                    <div class="form-group">
+                        {{ form.email.label(class="block text-sm font-medium text-gray-700 dark:text-gray-300") }}
+                        <div class="mt-1 relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-envelope text-gray-400"></i>
+                            </div>
+                            {{ form.email(class="appearance-none block w-full pl-10 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white", placeholder="Enter your email") }}
+                        </div>
+                        {% if form.email.errors %}
+                            {% for error in form.email.errors %}
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
                     </div>
-                    {% if form.email.errors %}
-                        {% for error in form.email.errors %}
-                            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
-                        {% endfor %}
-                    {% endif %}
+
+                    <div class="form-group">
+                        {{ form.password.label(class="block text-sm font-medium text-gray-700 dark:text-gray-300") }}
+                        <div class="mt-1 relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-lock text-gray-400"></i>
+                            </div>
+                            {{ form.password(class="appearance-none block w-full pl-10 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white", placeholder="Enter your password") }}
+                        </div>
+                        {% if form.password.errors %}
+                            {% for error in form.password.errors %}
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <input id="remember_me" name="remember_me" type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600">
+                            <label for="remember_me" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                                Remember me
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <button type="submit"
+                                class="btn-college-primary w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium">
+                            <i class="fas fa-sign-in-alt mr-2"></i> Sign in
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="college-card-footer">
+                <div class="text-center">
+                    <span class="text-sm text-gray-500 dark:text-gray-400">
+                        New to the College Portal?
+                    </span>
                 </div>
 
-                <div>
-                    {{ form.password.label(class="block text-sm font-medium text-gray-700") }}
-                    <div class="mt-1">
-                        {{ form.password(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", placeholder="Enter your password") }}
-                    </div>
-                    {% if form.password.errors %}
-                        {% for error in form.password.errors %}
-                            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
-                        {% endfor %}
-                    {% endif %}
-                </div>
-
-                <div>
-                    <button type="submit"
-                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
-                        Sign in
-                    </button>
-                </div>
-            </form>
-
-            <div class="mt-6">
-                <div class="relative">
-                    <div class="absolute inset-0 flex items-center">
-                        <div class="w-full border-t border-gray-300"></div>
-                    </div>
-                    <div class="relative flex justify-center text-sm">
-                        <span class="px-2 bg-white text-gray-500">
-                            New to OD System?
-                        </span>
-                    </div>
-                </div>
-
-                <div class="mt-6">
+                <div class="mt-3">
                     <a href="{{ url_for('register') }}"
-                       class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
-                        Create an account
+                       class="w-full flex justify-center py-2 px-4 border border-indigo-500 rounded-md shadow-sm text-sm font-medium text-indigo-600 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200 dark:bg-gray-700 dark:text-indigo-400 dark:border-indigo-400 dark:hover:bg-gray-600">
+                        <i class="fas fa-user-plus mr-2"></i> Create a student account
                     </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize AOS (Animate On Scroll)
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+    });
+</script>
 {% endblock %}

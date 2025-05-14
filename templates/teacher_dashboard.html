@@ -2,74 +2,332 @@
 
 {% block title %}Teacher Dashboard - OD System{% endblock %}
 
+{% block extra_css %}
+<style>
+    .dashboard-header {
+        background-color: var(--college-primary);
+        background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3z' fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .faculty-stat-card {
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        border-radius: 0.5rem;
+    }
+    
+    .faculty-stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .faculty-stat-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 30%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.03);
+        clip-path: polygon(100% 0, 0 0, 100% 100%);
+    }
+    
+    .approval-button {
+        transition: all 0.2s ease;
+    }
+    
+    .approval-button:hover {
+        transform: translateY(-2px);
+    }
+    
+    .request-row {
+        transition: all 0.2s ease;
+        position: relative;
+    }
+    
+    .request-row:hover {
+        background-color: rgba(79, 70, 229, 0.05);
+    }
+    
+    .request-row::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background-color: transparent;
+        transition: background-color 0.2s ease;
+    }
+    
+    .request-row:hover::before {
+        background-color: var(--college-primary);
+    }
+    
+    .student-avatar {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .student-avatar::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+    }
+    
+    .stats-overview {
+        background-image: linear-gradient(to right, var(--college-primary), #1e3a8a);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="min-h-screen bg-gray-100 dark:bg-gray-900 py-6 sm:py-12" data-cue="fadeIn">
+<div class="min-h-screen bg-gray-100 dark:bg-gray-900" data-aos="fade-in">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header text-white py-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold">Faculty Dashboard</h1>
+                    <p class="mt-2 text-indigo-100">Welcome, Prof. {{ current_user.name }}</p>
+                </div>
+                <div class="mt-4 md:mt-0 flex items-center">
+                    <span class="college-badge college-badge-secondary mr-2">Faculty</span>
+                    <span class="text-sm bg-white bg-opacity-20 px-3 py-1 rounded-full">
+                        <i class="fas fa-calendar-alt mr-1"></i> {{ today.strftime('%b %d, %Y') }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Grid -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-8">
-            <h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-                Teacher Dashboard
-            </h2>
-            <p class="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
-                Review and manage student On-Duty requests
-            </p>
+        <div class="stats-overview text-white p-6 rounded-lg -mt-8 shadow-lg" data-aos="fade-up">
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+                <div class="flex flex-col">
+                    <span class="text-sm text-indigo-200 uppercase tracking-wider">Pending Reviews</span>
+                    <div class="flex items-center mt-2">
+                        <span class="text-3xl font-bold">{{ pending_count }}</span>
+                        <span class="ml-2 text-sm bg-yellow-400 text-yellow-900 px-2 py-0.5 rounded">Waiting</span>
+                    </div>
+                    <span class="mt-1 text-xs text-indigo-200">Requests awaiting your approval</span>
+                </div>
+                
+                <div class="flex flex-col">
+                    <span class="text-sm text-indigo-200 uppercase tracking-wider">Today's Requests</span>
+                    <div class="flex items-center mt-2">
+                        <span class="text-3xl font-bold">{{ todays_count }}</span>
+                        <span class="ml-2 text-sm bg-blue-400 text-blue-900 px-2 py-0.5 rounded">Today</span>
+                    </div>
+                    <span class="mt-1 text-xs text-indigo-200">New submissions today</span>
+                </div>
+                
+                <div class="flex flex-col">
+                    <span class="text-sm text-indigo-200 uppercase tracking-wider">Total Actions</span>
+                    <div class="flex items-center mt-2">
+                        <span class="text-3xl font-bold">{{ total_actions }}</span>
+                        <span class="ml-2 text-sm bg-green-400 text-green-900 px-2 py-0.5 rounded">Processed</span>
+                    </div>
+                    <span class="mt-1 text-xs text-indigo-200">Requests you've processed</span>
+                </div>
+            </div>
         </div>
 
-        <!-- Stats Grid -->
-        <div class="mt-10" data-cue="slideUp">
-            <dl class="grid grid-cols-1 gap-5 sm:grid-cols-3">
-                <div class="px-4 py-5 bg-white shadow rounded-lg overflow-hidden sm:p-6">
-                    <dt class="text-sm font-medium text-gray-500 truncate">
-                        Pending Reviews
-                    </dt>
-                    <dd class="mt-1 text-3xl font-semibold text-yellow-500">
-                        {{ pending_count }}
-                    </dd>
+        <!-- Quick Stats Cards -->
+        <div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3" data-aos="fade-up" data-aos-delay="100">
+            <div class="faculty-stat-card bg-white dark:bg-gray-800 shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300">
+                        <i class="fas fa-chart-line text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Approval Rate</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Last 30 days</p>
+                    </div>
                 </div>
-
-                <div class="px-4 py-5 bg-white shadow rounded-lg overflow-hidden sm:p-6">
-                    <dt class="text-sm font-medium text-gray-500 truncate">
-                        Today's Requests
-                    </dt>
-                    <dd class="mt-1 text-3xl font-semibold text-blue-500">
-                        {{ todays_count }}
-                    </dd>
+                <div class="mt-4">
+                    <div class="flex items-baseline">
+                        <p class="text-2xl font-semibold text-gray-900 dark:text-white">92%</p>
+                        <p class="ml-2 text-sm text-green-600 dark:text-green-400">
+                            <i class="fas fa-arrow-up mr-1"></i>
+                            3.2%
+                        </p>
+                    </div>
+                    <div class="mt-1 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div class="bg-green-500 h-2 rounded-full" style="width: 92%"></div>
+                    </div>
                 </div>
-
-                <div class="px-4 py-5 bg-white shadow rounded-lg overflow-hidden sm:p-6">
-                    <dt class="text-sm font-medium text-gray-500 truncate">
-                        Total Actions
-                    </dt>
-                    <dd class="mt-1 text-3xl font-semibold text-indigo-500">
-                        {{ total_actions }}
-                    </dd>
+            </div>
+            
+            <div class="faculty-stat-card bg-white dark:bg-gray-800 shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300">
+                        <i class="fas fa-clock text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Response Time</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Average</p>
+                    </div>
                 </div>
-            </dl>
+                <div class="mt-4">
+                    <div class="flex items-baseline">
+                        <p class="text-2xl font-semibold text-gray-900 dark:text-white">5.2 hrs</p>
+                        <p class="ml-2 text-sm text-green-600 dark:text-green-400">
+                            <i class="fas fa-arrow-down mr-1"></i>
+                            0.8 hrs
+                        </p>
+                    </div>
+                    <div class="mt-1 flex items-center">
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400 ml-1"></i>
+                        <i class="fas fa-star text-yellow-400 ml-1"></i>
+                        <i class="fas fa-star text-yellow-400 ml-1"></i>
+                        <i class="fas fa-star-half-alt text-yellow-400 ml-1"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="faculty-stat-card bg-white dark:bg-gray-800 shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300">
+                        <i class="fas fa-calendar-check text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">This Month</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Total requests</p>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="flex items-baseline">
+                        <p class="text-2xl font-semibold text-gray-900 dark:text-white">47</p>
+                        <p class="ml-2 text-sm text-red-600 dark:text-red-400">
+                            <i class="fas fa-arrow-up mr-1"></i>
+                            12%
+                        </p>
+                    </div>
+                    <div class="mt-3 grid grid-cols-7 gap-1">
+                        {% for i in range(7) %}
+                        <div class="h-2 bg-purple-{% if i < 5 %}500{% else %}200{% endif %} rounded"></div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Pending Requests Table -->
-        <div class="mt-8" data-cue="slideUp" data-delay="200">
-            <div class="sm:flex sm:items-center">
-                <div class="sm:flex-auto">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900">Pending Requests</h3>
-                    <p class="mt-2 text-sm text-gray-700">
-                        A list of student requests waiting for your review.
-                    </p>
+        <div class="mt-8 bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden" data-aos="fade-up" data-aos-delay="200">
+            <div class="px-4 py-5 border-b border-gray-200 dark:border-gray-700 sm:px-6">
+                <div class="flex items-center justify-between flex-wrap sm:flex-nowrap">
+                    <div>
+                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Pending Requests</h3>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            Student requests awaiting your review and approval
+                        </p>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                            {{ pending_count }} Pending
+                        </span>
+                    </div>
                 </div>
             </div>
-            <div class="mt-8 flex flex-col">
-                <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                    <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-                        <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-                            <table class="min-w-full divide-y divide-gray-300">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Student</th>
-                                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Event</th>
-                                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Date</th>
-                                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-gray-200 bg-white">
+            
+            {% if od_requests %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-900">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Student</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Event</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Date</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Submitted</th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        {% for od in od_requests %}
+                        <tr class="request-row">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="h-10 w-10 flex-shrink-0">
+                                        <span class="student-avatar inline-flex h-10 w-10 items-center justify-center rounded-full bg-indigo-500">
+                                            <span class="text-lg font-medium leading-none text-white">
+                                                {{ od.student_name[0] }}
+                                            </span>
+                                        </span>
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="font-medium text-gray-900 dark:text-white">{{ od.student_name }}</div>
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">{{ od.email }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="text-sm text-gray-900 dark:text-white font-medium">{{ od.event_name }}</div>
+                                <div class="text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs">
+                                    {{ od.description[:30] }}{% if od.description|length > 30 %}...{% endif %}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
+                                    {{ od.date.strftime('%d %b, %Y') }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                {{ od.created_at.strftime('%b %d, %H:%M') }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">                                <div class="flex space-x-2 justify-end">
+                                    <a href="{{ url_for('view_request', request_id=od.id) }}" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <form action="{{ url_for('approve_od', od_id=od.id) }}" method="POST" class="inline-block">
+                                        <button type="submit" class="approval-button text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </form>
+                                    <form action="{{ url_for('reject_od', od_id=od.id) }}" method="POST" class="inline-block">
+                                        <button type="submit" class="approval-button text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-10">
+                <i class="fas fa-clipboard-check text-4xl text-gray-400 dark:text-gray-600"></i>
+                <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-gray-200">No pending requests</h3>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">All caught up! You've reviewed all student requests.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize AOS (Animate On Scroll)
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+    });
+</script>
+{% endblock %}
                                     {% for od in od_requests %}
                                     <tr>
                                         <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">

@@ -2,93 +2,169 @@
 
 {% block title %}Register - OD System{% endblock %}
 
+{% block extra_css %}
+<style>
+    .register-container {
+        background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path fill="%231E40AF" fill-opacity="0.05" d="M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5z"></path></svg>');
+    }
+    .campus-decorations {
+        position: absolute;
+        width: 400px;
+        height: 400px;
+        background-color: rgba(79, 70, 229, 0.02);
+        border-radius: 50%;
+        top: 10%;
+        left: -200px;
+        z-index: 0;
+    }
+    .campus-decorations:before {
+        content: "";
+        position: absolute;
+        width: 250px;
+        height: 250px;
+        background-color: rgba(79, 70, 229, 0.03);
+        border-radius: 50%;
+        bottom: -50px;
+        right: -100px;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8" data-cue="fadeIn">
+<div class="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 register-container relative" data-aos="fade-in">
+    <div class="campus-decorations"></div>
+    
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Create an account
+        <div class="college-banner">
+            <h2 class="text-center text-lg font-semibold text-white">
+                JOIN OUR STUDENT COMMUNITY
+            </h2>
+        </div>
+        <h2 class="mt-2 text-center text-3xl font-extrabold text-gray-900 dark:text-gray-100">
+            Start your academic journey
         </h2>
-        <p class="mt-2 text-center text-sm text-gray-600">
+        <p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
             Or
-            <a href="{{ url_for('login') }}" class="font-medium text-indigo-600 hover:text-indigo-500">
+            <a href="{{ url_for('login') }}" class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
                 sign in to your existing account
             </a>
         </p>
     </div>
 
     <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10" data-cue="slideUp">
-            <form method="POST" action="{{ url_for('register') }}" class="space-y-6">
-                {{ form.csrf_token }}
+        <div class="college-card" data-aos="fade-up" data-aos-delay="200">
+            <div class="college-card-header">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 flex items-center">
+                    <i class="fas fa-user-graduate mr-2 text-indigo-600 dark:text-indigo-400"></i>
+                    New Student Registration
+                </h3>
+            </div>
+            <div class="college-card-body">
+                <form method="POST" action="{{ url_for('register') }}" class="college-form space-y-6">
+                    {{ form.csrf_token }}
 
-                <div>
-                    {{ form.name.label(class="block text-sm font-medium text-gray-700") }}
-                    <div class="mt-1">
-                        {{ form.name(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", placeholder="Enter your name") }}
+                    <div class="form-group">
+                        {{ form.name.label(class="block text-sm font-medium text-gray-700 dark:text-gray-300") }}
+                        <div class="mt-1 relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-user text-gray-400"></i>
+                            </div>
+                            {{ form.name(class="appearance-none block w-full pl-10 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white", placeholder="Enter your full name") }}
+                        </div>
+                        {% if form.name.errors %}
+                            {% for error in form.name.errors %}
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
                     </div>
-                    {% if form.name.errors %}
-                        {% for error in form.name.errors %}
-                            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
-                        {% endfor %}
-                    {% endif %}
-                </div>
-                
-                <div>
-                    {{ form.email.label(class="block text-sm font-medium text-gray-700") }}
-                    <div class="mt-1">
-                        {{ form.email(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", placeholder="Enter your email") }}
+                    
+                    <div class="form-group">
+                        {{ form.email.label(class="block text-sm font-medium text-gray-700 dark:text-gray-300") }}
+                        <div class="mt-1 relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-envelope text-gray-400"></i>
+                            </div>
+                            {{ form.email(class="appearance-none block w-full pl-10 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white", placeholder="Enter your email address") }}
+                        </div>
+                        {% if form.email.errors %}
+                            {% for error in form.email.errors %}
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
                     </div>
-                    {% if form.email.errors %}
-                        {% for error in form.email.errors %}
-                            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
-                        {% endfor %}
-                    {% endif %}
-                </div>
 
-                <div>
-                    {{ form.password.label(class="block text-sm font-medium text-gray-700") }}
-                    <div class="mt-1">
-                        {{ form.password(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", placeholder="Choose a password") }}
+                    <div class="form-group">
+                        {{ form.password.label(class="block text-sm font-medium text-gray-700 dark:text-gray-300") }}
+                        <div class="mt-1 relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-lock text-gray-400"></i>
+                            </div>
+                            {{ form.password(class="appearance-none block w-full pl-10 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white", placeholder="Choose a secure password") }}
+                        </div>
+                        {% if form.password.errors %}
+                            {% for error in form.password.errors %}
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
                     </div>
-                    {% if form.password.errors %}
-                        {% for error in form.password.errors %}
-                            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
-                        {% endfor %}
-                    {% endif %}
-                </div>
 
-                <div>
-                    {{ form.confirm_password.label(class="block text-sm font-medium text-gray-700") }}
-                    <div class="mt-1">
-                        {{ form.confirm_password(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", placeholder="Confirm your password") }}
+                    <div class="form-group">
+                        {{ form.confirm_password.label(class="block text-sm font-medium text-gray-700 dark:text-gray-300") }}
+                        <div class="mt-1 relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-lock text-gray-400"></i>
+                            </div>
+                            {{ form.confirm_password(class="appearance-none block w-full pl-10 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white", placeholder="Confirm your password") }}
+                        </div>
+                        {% if form.confirm_password.errors %}
+                            {% for error in form.confirm_password.errors %}
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
                     </div>
-                    {% if form.confirm_password.errors %}
-                        {% for error in form.confirm_password.errors %}
-                            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
-                        {% endfor %}
-                    {% endif %}
-                </div>
 
-                <div>
-                    {{ form.role.label(class="block text-sm font-medium text-gray-700") }}
-                    <div class="mt-1">
-                        {{ form.role(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm") }}
+                    <div class="form-group">
+                        {{ form.role.label(class="block text-sm font-medium text-gray-700 dark:text-gray-300") }}
+                        <div class="mt-1 relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-user-tag text-gray-400"></i>
+                            </div>
+                            {{ form.role(class="appearance-none block w-full pl-10 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white") }}
+                        </div>
+                        {% if form.role.errors %}
+                            {% for error in form.role.errors %}
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
                     </div>
-                    {% if form.role.errors %}
-                        {% for error in form.role.errors %}
-                            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
-                        {% endfor %}
-                    {% endif %}
-                </div>
 
-                <div>
-                    <button type="submit"
-                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
-                        Register
-                    </button>
-                </div>
-            </form>
+                    <div class="college-alert college-alert-info text-sm">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        Your account information will be verified by administrators before full access is granted.
+                    </div>
+
+                    <div>
+                        <button type="submit"
+                                class="btn-college-primary w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium">
+                            <i class="fas fa-user-plus mr-2"></i> Create Account
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize AOS (Animate On Scroll)
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+    });
+</script>
 {% endblock %}

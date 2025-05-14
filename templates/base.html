@@ -40,10 +40,13 @@
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Custom styles -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">    <!-- Custom styles -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/college-theme.css') }}">
+
+    <!-- AOS - Animate On Scroll Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
     <style>
         html {
@@ -67,21 +70,23 @@
     {% block extra_css %}{% endblock %}
 </head>
 
-<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-    <!-- Navigation -->
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">    <!-- Navigation -->
     <nav class="bg-white dark:bg-gray-800 shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <!-- Logo section -->
                 <div class="flex items-center">
                     <a href="https://www.srmist.edu.in" target="_blank" class="flex-shrink-0">
-                        <img src="{{ url_for('static', filename='images/srm.jpg') }}" alt="SRM Logo" class="h-8 w-auto">
+                        <img src="{{ url_for('static', filename='images/srm.jpg') }}" alt="SRM Logo" class="h-10 w-auto">
                     </a>
                     <div class="h-6 w-px mx-4 bg-gray-200 dark:bg-gray-700"></div>
                     <a href="{{ url_for('index') }}" class="flex items-center">
-                        <i class="fas fa-calendar-check text-indigo-600 dark:text-indigo-400 text-2xl mr-2"></i>
+                        <i class="fas fa-graduation-cap text-indigo-600 dark:text-indigo-400 text-2xl mr-2"></i>
                         <span class="font-bold text-xl text-gray-900 dark:text-white">OD System</span>
                     </a>
+                    <div class="ml-4 hidden md:flex">
+                        <span class="college-badge">College Portal</span>
+                    </div>
                 </div>
 
                 <!-- Navigation links -->
@@ -90,19 +95,21 @@
                         {% if current_user.role == 'student' %}
                             <a href="{{ url_for('student_dashboard') }}" 
                                class="text-gray-600 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                                Dashboard
+                                <i class="fas fa-tachometer-alt mr-1"></i> Dashboard
                             </a>
                             <a href="{{ url_for('submit_od') }}"
                                class="text-gray-600 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                                Submit OD
+                                <i class="fas fa-plus-circle mr-1"></i> Submit OD
                             </a>
                         {% elif current_user.role == 'teacher' %}
                             <a href="{{ url_for('teacher_dashboard') }}"
                                class="text-gray-600 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                                Dashboard
+                                <i class="fas fa-tachometer-alt mr-1"></i> Dashboard
                             </a>
                         {% endif %}
-                    {% endif %}                    <!-- Theme toggle button -->
+                    {% endif %}                    
+                    
+                    <!-- Theme toggle button -->
                     <button id="theme-toggle" type="button" aria-label="Toggle dark mode"
                             class="relative w-10 h-10 p-2 rounded-lg text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors duration-200">
                         <i class="fas fa-sun text-lg" id="theme-toggle-light-icon"></i>
@@ -112,16 +119,16 @@
                     {% if current_user.is_authenticated %}
                         <a href="{{ url_for('logout') }}"
                            class="text-gray-600 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                            Logout
+                           <i class="fas fa-sign-out-alt mr-1"></i> Logout
                         </a>
                     {% else %}
                         <a href="{{ url_for('login') }}"
                            class="text-gray-600 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                            Login
+                           <i class="fas fa-sign-in-alt mr-1"></i> Login
                         </a>
                         <a href="{{ url_for('register') }}"
-                           class="text-gray-600 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                            Register
+                           class="btn-college-primary text-sm py-1.5 px-4 rounded-full">
+                           <i class="fas fa-user-plus mr-1"></i> Register
                         </a>
                     {% endif %}
                 </div>
