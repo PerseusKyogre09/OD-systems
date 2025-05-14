@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}View OD Request - OD System{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100 py-6">
+    <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
+        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <!-- Header -->
+            <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">
+                        OD Request Details
+                    </h3>
+                    <span class="status-badge {{ 'status-' + request.status.lower() }}">
+                        {{ request.status }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="px-4 py-5 sm:p-6">
+                <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                    <div class="sm:col-span-1">
+                        <dt class="text-sm font-medium text-gray-500">Event Name</dt>
+                        <dd class="mt-1 text-sm text-gray-900">{{ request.event_name }}</dd>
+                    </div>
+
+                    <div class="sm:col-span-1">
+                        <dt class="text-sm font-medium text-gray-500">Date</dt>
+                        <dd class="mt-1 text-sm text-gray-900">{{ request.date }}</dd>
+                    </div>
+
+                    <div class="sm:col-span-2">
+                        <dt class="text-sm font-medium text-gray-500">Description</dt>
+                        <dd class="mt-1 text-sm text-gray-900">{{ request.description }}</dd>
+                    </div>
+
+                    {% if request.document_path %}
+                    <div class="sm:col-span-2">
+                        <dt class="text-sm font-medium text-gray-500">Supporting Document</dt>
+                        <dd class="mt-1 text-sm text-gray-900">
+                            <a href="{{ url_for('static', filename='uploads/' + request.document_path) }}"
+                               class="inline-flex items-center text-indigo-600 hover:text-indigo-500"
+                               target="_blank">
+                                <svg class="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
+                                </svg>
+                                View Document
+                            </a>
+                        </dd>
+                    </div>
+                    {% endif %}
+
+                    {% if request.status == 'Pending' and current_user.role == 'teacher' %}
+                    <div class="sm:col-span-2 border-t pt-5">
+                        <div class="flex justify-end space-x-3">
+                            <form method="POST" action="{{ url_for('reject_od', od_id=request.id) }}" class="inline">
+                                <button type="submit"
+                                        class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                    Reject
+                                </button>
+                            </form>
+                            <form method="POST" action="{{ url_for('approve_od', od_id=request.id) }}" class="inline">
+                                <button type="submit"
+                                        class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                    Approve
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if request.status != 'Pending' %}
+                    <div class="sm:col-span-2">
+                        <dt class="text-sm font-medium text-gray-500">Decision made by</dt>
+                        <dd class="mt-1 text-sm text-gray-900">
+                            {{ request.decided_by }}
+                            <span class="text-gray-500">on {{ request.decided_at }}</span>
+                        </dd>
+                    </div>
+                    {% endif %}
+                </dl>
+            </div>
+
+            <!-- Comments Section -->
+            <div class="px-4 py-5 sm:px-6 border-t border-gray-200">
+                <h4 class="text-lg font-medium text-gray-900 mb-4">Comments</h4>
+                
+                {% if comments %}
+                <div class="space-y-4 mb-6">
+                    {% for comment in comments %}
+                    <div class="flex space-x-3">
+                        <div class="flex-shrink-0">
+                            <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-gray-500">
+                                <span class="text-sm font-medium leading-none text-white">
+                                    {{ comment.author[0] }}
+                                </span>
+                            </span>
+                        </div>
+                        <div class="flex-1 bg-gray-50 rounded-lg px-4 py-3">
+                            <div class="text-sm">
+                                <span class="font-medium text-gray-900">{{ comment.author }}</span>
+                            </div>
+                            <div class="mt-1 text-sm text-gray-700">
+                                {{ comment.content }}
+                            </div>
+                            <div class="mt-2 text-xs text-gray-500">
+                                {{ comment.created_at }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Comment Form -->
+                <form method="POST" action="{{ url_for('add_comment', request_id=request.id) }}" class="mt-4">
+                    <div>
+                        <label for="comment" class="sr-only">Add your comment</label>
+                        <textarea id="comment" name="comment" rows="3" required
+                                  class="shadow-sm block w-full focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border border-gray-300 rounded-md"
+                                  placeholder="Add a comment..."></textarea>
+                    </div>
+                    <div class="mt-3 flex justify-end">
+                        <button type="submit"
+                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Post Comment
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Back Button -->
+        <div class="mt-6">
+            <a href="{{ url_for(current_user.role + '_dashboard') }}"
+               class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                </svg>
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,83 +1,94 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f0f2f5; /* Light background */
-            margin: 0;
-        }
-        .container {
-            background-color: white;
-            padding: 30px; /* Increased padding for a more spacious feel */
-            border-radius: 10px; /* Rounded corners */
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-            width: 320px; /* Fixed width for consistency */
-            box-sizing: border-box; /* Include padding in width */
-        }
-        h2 {
-            text-align: center;
-            color: #333; /* Darker text for contrast */
-            margin-bottom: 20px; /* Space below the heading */
-        }
-        label {
-            margin-bottom: 5px;
-            display: block;
-            color: #555; /* Lighter text color */
-        }
-        input[type="email"],
-        input[type="password"],
-        select {
-            width: 100%;
-            padding: 12px; /* Increased padding for better touch area */
-            margin: 10px 0; /* Consistent margin */
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px; /* Font size for readability */
-            box-sizing: border-box; /* Include padding in width */
-        }
-        input[type="submit"] {
-            background-color: #007bff; /* Bootstrap primary color */
-            color: white;
-            border: none;
-            padding: 12px; /* Increased padding for button */
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s; /* Smooth hover transition */
-            width: 100%; /* Full width for submit button */
-            margin-top: 10px; /* Space above the button */
-        }
-        input[type="submit"]:hover {
-            background-color: #0056b3; /* Darker shade on hover */
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2>Register</h2>
-        <form action="/register" method="POST">
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
-            
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-            
-            <label for="role">Role:</label>
-            <select id="role" name="role" required>
-                <option value="student">Student</option>
-                <option value="teacher">Teacher</option>
-            </select>
-            
-            <input type="submit" value="Register">
-        </form>
+{% extends "base.html" %}
+
+{% block title %}Register - OD System{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8" data-cue="fadeIn">
+    <div class="sm:mx-auto sm:w-full sm:max-w-md">
+        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Create an account
+        </h2>
+        <p class="mt-2 text-center text-sm text-gray-600">
+            Or
+            <a href="{{ url_for('login') }}" class="font-medium text-indigo-600 hover:text-indigo-500">
+                sign in to your existing account
+            </a>
+        </p>
     </div>
-</body>
-</html>
+
+    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10" data-cue="slideUp">
+            <form method="POST" action="{{ url_for('register') }}" class="space-y-6">
+                {{ form.csrf_token }}
+
+                <div>
+                    {{ form.name.label(class="block text-sm font-medium text-gray-700") }}
+                    <div class="mt-1">
+                        {{ form.name(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", placeholder="Enter your name") }}
+                    </div>
+                    {% if form.name.errors %}
+                        {% for error in form.name.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                
+                <div>
+                    {{ form.email.label(class="block text-sm font-medium text-gray-700") }}
+                    <div class="mt-1">
+                        {{ form.email(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", placeholder="Enter your email") }}
+                    </div>
+                    {% if form.email.errors %}
+                        {% for error in form.email.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <div>
+                    {{ form.password.label(class="block text-sm font-medium text-gray-700") }}
+                    <div class="mt-1">
+                        {{ form.password(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", placeholder="Choose a password") }}
+                    </div>
+                    {% if form.password.errors %}
+                        {% for error in form.password.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <div>
+                    {{ form.confirm_password.label(class="block text-sm font-medium text-gray-700") }}
+                    <div class="mt-1">
+                        {{ form.confirm_password(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", placeholder="Confirm your password") }}
+                    </div>
+                    {% if form.confirm_password.errors %}
+                        {% for error in form.confirm_password.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <div>
+                    {{ form.role.label(class="block text-sm font-medium text-gray-700") }}
+                    <div class="mt-1">
+                        {{ form.role(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm") }}
+                    </div>
+                    {% if form.role.errors %}
+                        {% for error in form.role.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <div>
+                    <button type="submit"
+                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
+                        Register
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
