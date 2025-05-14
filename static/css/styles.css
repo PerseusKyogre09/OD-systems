@@ -1,6 +1,38 @@
-/* Theme variables and base styles */
+/* 
+ * Consolidated CSS for OD System
+ * Combines styles.css, college-theme.css, and college-theme-fixes.css
+ */
+
+/*----------------------------------------------*\
+  THEME VARIABLES AND BASE STYLES
+\*----------------------------------------------*/
+
 :root {
-    --theme-transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  /* Base theme transitions */
+  --theme-transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  
+  /* College color palette */
+  --college-primary: #1e40af;    /* Deep blue */
+  --college-secondary: #f59e0b;  /* Gold accent */
+  --college-tertiary: #10b981;   /* Green for success */
+  --college-dark: #1f2937;       /* Dark blue-gray */
+  --college-light: #f3f4f6;      /* Light gray */
+  --college-paper: #ffffff;      /* White for paper-like backgrounds */
+  --college-accent: #7c3aed;     /* Purple accent */
+  
+  /* Font sizes */
+  --heading-xl: 3rem;
+  --heading-lg: 2.25rem;
+  --heading-md: 1.5rem;
+  --heading-sm: 1.25rem;
+  --text-base: 1rem;
+  
+  /* Spacing */
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-xxl: 3rem;
 }
 
 /* Smooth transitions for theme changes */
@@ -14,917 +46,497 @@ button,
 input,
 select,
 textarea {
-    transition: var(--theme-transition);
+  transition: var(--theme-transition);
 }
 
-/* Dark mode styles */
+/*----------------------------------------------*\
+  DARK MODE STYLES
+\*----------------------------------------------*/
+
 .dark {
-    color-scheme: dark;
+  color-scheme: dark;
 }
 
 .dark body {
-    background-color: #111827;
-    color: #f3f4f6;
+  background-color: #111827;
+  color: #f3f4f6;
 }
 
-/* Dark mode refinements */
-.dark body {
-    background-color: #111827;
-    color: #e5e7eb;
+/*----------------------------------------------*\
+  COLLEGE BADGE ELEMENT
+\*----------------------------------------------*/
+
+.college-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  background-color: var(--college-primary);
+  color: white;
+  font-weight: 600;
+  font-size: 0.85rem;
+  border-radius: 9999px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin-right: 0.5rem;
 }
 
-/* Content boxes in dashboard pages */
-.dark .bg-white {
-    background-color: #1f2937;
+.college-badge-secondary {
+  background-color: var(--college-secondary);
+  color: var(--college-dark);
 }
 
-.dark .text-gray-900 {
-    color: #f3f4f6;
+.college-badge-success {
+  background-color: var(--college-tertiary);
 }
 
-.dark .text-gray-700,
-.dark .text-gray-600,
-.dark .text-gray-500 {
-    color: #d1d5db;
+/*----------------------------------------------*\
+  HERO SECTION WITH COLLEGE THEME
+\*----------------------------------------------*/
+
+.college-hero {
+  background: linear-gradient(135deg, var(--college-primary) 0%, #163e75 100%);
+  color: white;
+  padding: var(--space-xxl) 0;
+  position: relative;
+  overflow: hidden;
 }
 
-/* Form labels in dark mode */
-.dark .block.text-sm.font-medium.text-gray-700 {
-    color: #e5e7eb;
+.college-hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+  opacity: 0.2;
 }
 
-/* Dashboard card elements */
-.dark .px-4.py-5.bg-white.shadow.rounded-lg,
-.dark .bg-white.py-8.px-4.shadow.sm\:rounded-lg,
-.dark .bg-white.py-8.px-4.shadow.sm\:rounded-lg.sm\:px-10 {
-    background-color: #1f2937;
-    border-color: #374151;
+/*----------------------------------------------*\
+  FORM ELEMENTS AND INPUT FIELDS
+\*----------------------------------------------*/
+
+/* Input fields with icons - FIX for icon overlap issue */
+.input-icon-wrapper {
+  position: relative;
 }
 
-/* Table headers in dark mode */
-.dark .bg-gray-50 {
-    background-color: #111827;
+.input-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6B7280;
+  pointer-events: none;
+  z-index: 5; /* Ensure icon is above input field */
 }
 
-.dark .bg-gray-50 th {
-    color: #f3f4f6;
+/* Added padding-left to input fields with icons */
+.input-icon-wrapper input,
+.input-icon-wrapper select {
+  padding-left: 2.5rem !important; /* Override any other padding styles */
 }
 
-/* Table rows in dark mode */
-.dark .divide-y.divide-gray-200.bg-white {
-    background-color: #1f2937;
+/* Fix for icon positioning in login form */
+.relative .absolute.inset-y-0.left-0 {
+  z-index: 5; /* Ensure icon is above input field */
 }
 
-.dark .divide-y.divide-gray-200.bg-white tr {
-    border-color: #374151;
+input.pl-10,
+select.pl-10 {
+  padding-left: 2.5rem !important; /* Ensure enough space for icon */
 }
 
-.dark .divide-y.divide-gray-300 {
-    border-color: #374151;
+/*----------------------------------------------*\
+  COLLEGE CARDS
+\*----------------------------------------------*/
+
+.college-card {
+  background-color: var(--college-paper);
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 10px 15px rgba(0, 0, 0, 0.03);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
 }
 
-/* Links in tables */
-.dark .text-indigo-600 {
-    color: #a5b4fc;
+.college-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
-.dark .text-indigo-600:hover {
-    color: #818cf8;
+.college-card-header {
+  padding: var(--space-md);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background-color: rgba(0, 0, 0, 0.02);
 }
 
-/* Status badges refinements for dark mode */
-.dark input,
-.dark select,
-.dark textarea {
-    background-color: #374151;
-    border-color: #4b5563;
-    color: #e5e7eb;
+.college-card-body {
+  padding: var(--space-lg);
 }
 
-.dark input:focus,
-.dark select:focus,
-.dark textarea:focus {
-    border-color: #6366f1;
-    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+.college-card-footer {
+  padding: var(--space-md);
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  background-color: rgba(0, 0, 0, 0.02);
 }
 
-/* Dark mode form and button styles */
-.dark input[type="text"],
-.dark input[type="email"],
-.dark input[type="password"],
-.dark input[type="number"],
-.dark input[type="date"],
-.dark select,
-.dark textarea {
-    background-color: #1f2937;
-    border-color: #374151;
-    color: #f3f4f6;
-}
+/*----------------------------------------------*\
+  STATUS BADGES AND INDICATORS
+\*----------------------------------------------*/
 
-.dark input[type="text"]:focus,
-.dark input[type="email"]:focus,
-.dark input[type="password"]:focus,
-.dark input[type="number"]:focus,
-.dark input[type="date"]:focus,
-.dark select:focus,
-.dark textarea:focus {
-    border-color: #6366f1;
-    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
-    outline: none;
-}
-
-.dark input[type="text"]::placeholder,
-.dark input[type="email"]::placeholder,
-.dark input[type="password"]::placeholder,
-.dark input[type="number"]::placeholder,
-.dark textarea::placeholder {
-    color: #9ca3af;
-}
-
-/* Input placeholders */
-.dark .placeholder-gray-400::placeholder {
-    color: #9ca3af;
-}
-
-.dark .btn-primary {
-    background-color: #4f46e5;
-    color: #ffffff;
-}
-
-.dark .btn-primary:hover {
-    background-color: #4338ca;
-}
-
-.dark .btn-secondary {
-    background-color: #374151;
-    color: #ffffff;
-    border-color: #4b5563;
-}
-
-.dark .btn-secondary:hover {
-    background-color: #4b5563;
-}
-
-.dark .btn-danger {
-    background-color: #dc2626;
-    color: #ffffff;
-}
-
-.dark .btn-danger:hover {
-    background-color: #b91c1c;
-}
-
-.dark .card {
-    background-color: #1f2937;
-    border-color: #374151;
-}
-
-.dark .card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
-}
-
-.dark .shadow-lg {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
-}
-
-/* Dark mode table styles */
-.dark table {
-    background-color: #1f2937;
-    border-color: #374151;
-}
-
-.dark table th {
-    background-color: #111827;
-    color: #f3f4f6;
-    border-color: #374151;
-}
-
-.dark table td {
-    border-color: #374151;
-    color: #d1d5db;
-}
-
-.dark table tbody tr:hover {
-    background-color: #374151;
-}
-
-/* Table cell background hover */
-.dark tbody tr:hover {
-    background-color: #374151;
-}
-
-/* Animations */
-.fade-in {
-    animation: fadeIn 0.5s ease-in;
-}
-
-.slide-up {
-    animation: slideUp 0.5s ease-out;
-}
-
-.slide-down {
-    animation: slideDown 0.5s ease-out;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-@keyframes slideUp {
-    from {
-        transform: translateY(20px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-@keyframes slideDown {
-    from {
-        transform: translateY(-20px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-@keyframes slideInLeft {
-    from {
-        transform: translateX(-30px);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-@keyframes slideInRight {
-    from {
-        transform: translateX(30px);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-@keyframes slideInUp {
-    from {
-        transform: translateY(30px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-/* Animation classes */
-.animate-slideInLeft {
-    animation: slideInLeft 0.6s ease-out;
-}
-
-.animate-slideInRight {
-    animation: slideInRight 0.6s ease-out;
-}
-
-.animate-slideInUp {
-    animation: slideInUp 0.6s ease-out;
-}
-
-.animate-fadeIn {
-    animation: fadeIn 0.6s ease-out;
-}
-
-/* Custom card hover effects */
-.hover-card {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.hover-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-}
-
-/* Status badges */
 .status-badge {
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  font-weight: 500;
+  font-size: 0.75rem;
+  border-radius: 9999px;
 }
 
 .status-pending {
-    background-color: #FEF3C7;
-    color: #92400E;
+  background-color: #fef3c7;
+  color: #92400e;
 }
 
 .status-approved {
-    background-color: #D1FAE5;
-    color: #065F46;
+  background-color: #d1fae5;
+  color: #065f46;
 }
 
 .status-rejected {
-    background-color: #FEE2E2;
-    color: #991B1B;
+  background-color: #fee2e2;
+  color: #b91c1c;
 }
 
-.status-badge--pending {
-    background-color: #fef3c7;
-    color: #92400e;
+/*----------------------------------------------*\
+  COLLEGE FORM ELEMENTS
+\*----------------------------------------------*/
+
+.college-form .form-group {
+  margin-bottom: var(--space-lg);
 }
 
-.status-badge--approved {
-    background-color: #dcfce7;
-    color: #166534;
+.college-form label {
+  display: block;
+  margin-bottom: var(--space-sm);
+  font-weight: 500;
+  color: var(--college-dark);
 }
 
-.status-badge--rejected {
-    background-color: #fee2e2;
-    color: #991b1b;
+.college-form input,
+.college-form select,
+.college-form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  background-color: white;
+  transition: border-color 0.15s ease;
 }
 
-/* Dark mode status badges */
-.dark .status-badge--pending {
-    background-color: #854d0e;
-    color: #fef3c7;
+.college-form input:focus,
+.college-form select:focus,
+.college-form textarea:focus {
+  outline: none;
+  border-color: var(--college-primary);
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
 }
 
-.dark .status-badge--approved {
-    background-color: #065f46;
-    color: #d1fae5;
+/*----------------------------------------------*\
+  BUTTONS WITH COLLEGE THEME
+\*----------------------------------------------*/
+
+.btn-college-primary {
+  background-color: var(--college-primary);
+  color: white;
+  font-weight: 500;
+  padding: 0.5rem 1.25rem;
+  border-radius: 0.375rem;
+  transition: background-color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.dark .status-badge--rejected {
-    background-color: #991b1b;
-    color: #fee2e2;
+.btn-college-primary:hover {
+  background-color: #1e3a8a;
 }
 
-/* Custom button styles */
-.btn-primary {
-    background-color: #4F46E5;
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 0.375rem;
-    font-weight: 500;
-    transition: background-color 0.2s ease;
+.btn-college-secondary {
+  background-color: white;
+  color: var(--college-primary);
+  border: 1px solid var(--college-primary);
+  font-weight: 500;
+  padding: 0.5rem 1.25rem;
+  border-radius: 0.375rem;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.btn-primary:hover {
-    background-color: #4338CA;
+.btn-college-secondary:hover {
+  background-color: #f8fafc;
 }
 
-.btn-secondary {
-    background-color: #F3F4F6;
-    color: #374151;
-    padding: 0.5rem 1rem;
-    border-radius: 0.375rem;
-    font-weight: 500;
-    transition: all 0.2s ease;
+.btn-college-success {
+  background-color: var(--college-tertiary);
+  color: white;
+  font-weight: 500;
+  padding: 0.5rem 1.25rem;
+  border-radius: 0.375rem;
+  transition: background-color 0.2s ease;
 }
 
-.btn-secondary:hover {
-    background-color: #E5E7EB;
-    color: #111827;
+.btn-college-success:hover {
+  background-color: #059669;
 }
 
-/* Custom form styles */
-.form-input {
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px solid #D1D5DB;
-    border-radius: 0.375rem;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+.btn-college-danger {
+  background-color: #ef4444;
+  color: white;
+  font-weight: 500;
+  padding: 0.5rem 1.25rem;
+  border-radius: 0.375rem;
+  transition: background-color 0.2s ease;
 }
 
-.form-input:focus {
-    outline: none;
-    border-color: #4F46E5;
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+.btn-college-danger:hover {
+  background-color: #dc2626;
 }
 
-.form-input:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+.btn-college-outline {
+  background-color: transparent;
+  color: var(--college-primary);
+  border: 1px solid currentColor;
+  font-weight: 500;
+  padding: 0.5rem 1.25rem;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
 }
 
-/* Glass effect */
-.glass {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+.btn-college-outline:hover {
+  background-color: var(--college-primary);
+  color: white;
 }
 
-/* Custom table styles */
-.custom-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
+/*----------------------------------------------*\
+  DASHBOARD STATS
+\*----------------------------------------------*/
+
+.stat-card {
+  padding: var(--space-lg);
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
 }
 
-.custom-table th {
-    background-color: #F9FAFB;
-    padding: 0.75rem 1rem;
-    font-weight: 600;
-    text-align: left;
-    color: #374151;
+.stat-card:hover {
+  transform: translateY(-3px);
 }
 
-.custom-table td {
-    padding: 0.75rem 1rem;
-    border-top: 1px solid #E5E7EB;
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-top: var(--space-sm);
+  margin-bottom: var(--space-sm);
 }
 
-.custom-table tr:hover {
-    background-color: #F9FAFB;
+.stat-label {
+  color: #4b5563;
+  font-size: 0.875rem;
 }
 
-.table-hover tr:hover {
-    background-color: #f8fafc;
+/*----------------------------------------------*\
+  COLLEGE THEMED ALERT BOXES
+\*----------------------------------------------*/
+
+.college-alert {
+  padding: var(--space-md) var(--space-lg);
+  border-radius: 0.375rem;
+  margin-bottom: var(--space-lg);
 }
 
-/* Loading animation */
-.loading {
-    width: 2rem;
-    height: 2rem;
-    border: 3px solid #E5E7EB;
-    border-top-color: #4F46E5;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    position: relative;
-    pointer-events: none;
+.college-alert-info {
+  background-color: #e0f2fe;
+  border-left: 4px solid #0ea5e9;
+  color: #0c4a6e;
 }
 
-.loading::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(255, 255, 255, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: inherit;
+.college-alert-success {
+  background-color: #dcfce7;
+  border-left: 4px solid #22c55e;
+  color: #166534;
 }
 
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
+.college-alert-warning {
+  background-color: #fef3c7;
+  border-left: 4px solid #f59e0b;
+  color: #92400e;
 }
 
-/* Responsive utilities */
-@media (max-width: 640px) {
-    .mobile-hidden {
-        display: none;
-    }
+.college-alert-error {
+  background-color: #fee2e2;
+  border-left: 4px solid #ef4444;
+  color: #b91c1c;
 }
 
-/* Custom scrollbar */
+/*----------------------------------------------*\
+  DARK THEME COMPATIBILITY
+\*----------------------------------------------*/
+
+.dark .college-card {
+  background-color: var(--college-dark);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2), 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+.dark .college-form label {
+  color: var(--college-light);
+}
+
+.dark .college-form input,
+.dark .college-form select,
+.dark .college-form textarea {
+  background-color: #374151;
+  border-color: #4b5563;
+  color: white;
+}
+
+.dark .college-form input:focus,
+.dark .college-form select:focus,
+.dark .college-form textarea:focus {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+}
+
+.dark .stat-card {
+  background-color: var(--college-dark);
+}
+
+.dark .stat-label {
+  color: #d1d5db;
+}
+
+/*----------------------------------------------*\
+  ANIMATED PATTERNS AND DECORATIONS
+\*----------------------------------------------*/
+
+.pattern-dots {
+  background-image: radial-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.pattern-grid {
+  background-size: 40px 40px;
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+}
+
+.campus-decoration {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background-color: rgba(255, 255, 255, 0.02);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+}
+
+/*----------------------------------------------*\
+  COLLEGE BANNER
+\*----------------------------------------------*/
+
+.college-banner {
+  position: relative;
+  background-color: var(--college-primary);
+  color: white;
+  padding: 1rem;
+  text-align: center;
+  font-weight: 500;
+  clip-path: polygon(0 0, 100% 0, 97% 100%, 3% 100%);
+  margin-bottom: 2rem;
+}
+
+/*----------------------------------------------*\
+  CUSTOM SCROLLBAR
+\*----------------------------------------------*/
+
 ::-webkit-scrollbar {
-    width: 10px;
+  width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-    background: #f1f1f1;
+  background: #f1f1f1;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 5px;
+  background: var(--college-primary);
+  border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #555;
-}
-
-/* Dark mode scrollbar */
-.dark ::-webkit-scrollbar {
-    width: 10px;
-}
-
-.dark ::-webkit-scrollbar-track {
-    background: #1f2937;
-}
-
-.dark ::-webkit-scrollbar-thumb {
-    background: #4b5563;
-    border-radius: 5px;
-}
-
-.dark ::-webkit-scrollbar-thumb:hover {
-    background: #6b7280;
-}
-
-/* Utility classes */
-.transition-smooth {
-    transition: all 0.3s ease;
-}
-
-.hover-lift {
-    transition: transform 0.2s ease;
-}
-
-.hover-lift:hover {
-    transform: translateY(-2px);
-}
-
-.shadow-smooth {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-                0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    transition: box-shadow 0.3s ease;
-}
-
-.shadow-smooth:hover {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-                0 4px 6px -2px rgba(0, 0, 0, 0.05);
-}
-
-/* Form inputs and buttons with smooth transitions */
-input,
-select,
-textarea,
-button {
-    transition: all 0.2s ease !important;
-}
-
-/* Card styles */
-.card {
-    background-color: #fff;
-    border-radius: 0.5rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1),
-                0 1px 2px rgba(0, 0, 0, 0.06);
-    transition: all 0.3s ease;
-}
-
-.card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1),
-                0 2px 4px rgba(0, 0, 0, 0.06);
-}
-
-/* Dark mode card styles */
-.dark .card {
-    background-color: #1f2937;
-    border-color: #374151;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-}
-
-.dark .card:hover {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
-}
-
-/* Theme transition */
-:root {
-    --theme-transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-}
-
-body,
-nav,
-footer,
-.bg-white,
-.text-gray-600,
-.text-gray-800,
-.text-gray-500,
-.border-gray-200 {
-    transition: var(--theme-transition);
-}
-
-/* Theme transitions */
-.theme-transition,
-body,
-header,
-nav,
-main,
-footer,
-input,
-select,
-textarea,
-button,
-.card,
-.btn {
-    transition-property: background-color, border-color, color, box-shadow;
-    transition-duration: 200ms;
-    transition-timing-function: ease-in-out;
-}
-
-/* Don't animate images */
-img {
-    transition: none !important;
-}
-
-/* Transition durations for smooth theme changes */
-.transition-theme {
-    transition-property: background-color, border-color, color, box-shadow;
-    transition-timing-function: ease-in-out;
-    transition-duration: 200ms;
-}
-
-/* Improved dark mode styles */
-html.dark {
-    color-scheme: dark;
-}
-
-html.dark body {
-    background-color: #111827;
-    color: #f9fafb;
-}
-
-/* Navigational elements */
-html.dark nav {
-    background-color: #1f2937;
-    border-color: #374151;
-}
-
-/* Form inputs */
-html.dark input,
-html.dark select,
-html.dark textarea {
-    background-color: #1f2937;
-    border-color: #374151;
-    color: #f3f4f6;
-}
-
-html.dark input:focus,
-html.dark select:focus,
-html.dark textarea:focus {
-    border-color: #4f46e5;
-    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.3);
-}
-
-/* Buttons */
-html.dark button,
-html.dark .btn {
-    background-color: #1f2937;
-    color: #f9fafb;
-    border-color: #374151;
-}
-
-html.dark button:hover,
-html.dark .btn:hover {
-    background-color: #374151;
-}
-
-html.dark button.btn-primary,
-html.dark .btn-primary {
-    background-color: #4f46e5;
-    color: #ffffff;
-}
-
-html.dark button.btn-primary:hover,
-html.dark .btn-primary:hover {
-    background-color: #4338ca;
-}
-
-/* Tables */
-html.dark table {
-    background-color: #1f2937;
-    color: #f9fafb;
-    border-color: #374151;
-}
-
-html.dark th {
-    background-color: #111827;
-    color: #f9fafb;
-    border-color: #374151;
-}
-
-html.dark td {
-    border-color: #374151;
-}
-
-html.dark tr:hover {
-    background-color: #374151;
-}
-
-/* Cards and panels */
-html.dark .card,
-html.dark .panel {
-    background-color: #1f2937;
-    border-color: #374151;
-    color: #f9fafb;
-}
-
-html.dark .card-header,
-html.dark .panel-header {
-    background-color: #111827;
-    border-color: #374151;
-}
-
-/* Shadows in dark mode */
-html.dark .shadow-md,
-html.dark .shadow-lg {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
-}
-
-/* Status badges in dark mode */
-html.dark .status-badge--pending {
-    background-color: #78350f;
-    color: #fde68a;
-}
-
-html.dark .status-badge--approved {
-    background-color: #065f46;
-    color: #a7f3d0;
-}
-
-html.dark .status-badge--rejected {
-    background-color: #991b1b;
-    color: #fecaca;
-}
-
-/* Transitions for theme switching */
-body, nav, main, footer, header,
-button, input, select, textarea, 
-.card, .panel, .btn, table, th, td {
-    transition: background-color 0.3s ease, 
-                color 0.3s ease, 
-                border-color 0.3s ease, 
-                box-shadow 0.3s ease;
-}
-
-/* Fix text color in dashboard heading */
-.dark .text-3xl.font-extrabold.text-gray-900,
-.dark .text-3xl.font-extrabold.text-gray-900.sm\:text-4xl {
-    color: #f3f4f6;
-}
-
-/* Fix subtitle text color on dashboard */
-.dark .text-xl.text-gray-500 {
-    color: #9ca3af;
-}
-
-/* Fix heading in the Recent Requests section */
-.dark .text-lg.leading-6.font-medium.text-gray-900 {
-    color: #f3f4f6;
-}
-
-/* Fix sub-heading in the Recent Requests section */
-.dark .mt-2.text-sm.text-gray-700 {
-    color: #d1d5db;
-}
-
-/* Table dividers */
-.dark .shadow.ring-1.ring-black.ring-opacity-5.md\:rounded-lg {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-    --tw-ring-color: rgba(0, 0, 0, 0.3);
-}
-
-/* Dashboard stats and cards improvements */
-.dark .text-yellow-500 {
-    color: #fcd34d;
-}
-
-.dark .text-green-500 {
-    color: #10b981;
-}
-
-.dark .text-blue-500 {
-    color: #3b82f6;
-}
-
-.dark .text-indigo-500 {
-    color: #6366f1;
-}
-
-/* Text in table cells */
-.dark .whitespace-nowrap.px-3.py-4.text-sm.text-gray-500 {
-    color: #9ca3af;
-}
-
-.dark .font-medium.text-gray-900 {
-    color: #f3f4f6;
-}
-
-.dark .text-gray-500 {
-    color: #9ca3af;
-}
-
-/* Card shadows in dark mode */
-.dark .shadow {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-/* Statuses */
-.dark .inline-flex.rounded-full.bg-yellow-100.px-2.text-xs.font-semibold.leading-5.text-yellow-800 {
-    background-color: #78350f;
-    color: #fef3c7;
-}
-
-.dark .inline-flex.rounded-full.bg-green-100.px-2.text-xs.font-semibold.leading-5.text-green-800 {
-    background-color: #065f46;
-    color: #d1fae5;
-}
-
-.dark .inline-flex.rounded-full.bg-red-100.px-2.text-xs.font-semibold.leading-5.text-red-800 {
-    background-color: #991b1b;
-    color: #fee2e2;
-}
-
-/* Background colors for view pages */
-.dark .relative.bg-white.overflow-hidden {
-    background-color: #1f2937;
-}
-
-/* Dividers in forms and cards */
-.dark .border-t.border-gray-300,
-.dark .border-t {
-    border-color: #374151;
-}
-
-/* Text colors in forms */
-.dark .text-center.text-sm.text-gray-600,
-.dark .mt-2.text-center.text-sm.text-gray-600 {
-    color: #9ca3af;
-}
-
-/* Fix for form submission page */
-.dark .px-2.bg-white.text-gray-500 {
-    background-color: #1f2937;
-    color: #9ca3af;
-}
-
-/* Index page styles for dark mode */
-.dark .text-4xl.tracking-tight.font-extrabold.text-gray-900 {
-    color: #f3f4f6;
-}
-
-.dark .text-4xl.tracking-tight.font-extrabold.text-gray-900.sm\\:text-5xl.md\\:text-6xl {
-    color: #f3f4f6;
-}
-
-/* Feature section on index page */
-.dark .mt-2.text-3xl.leading-8.font-extrabold.tracking-tight.text-gray-900.sm\\:text-4xl {
-    color: #f3f4f6;
-}
-
-.dark .text-lg.leading-6.font-medium.text-gray-900 {
-    color: #f3f4f6;
-}
-
-/* Buttons in index page */
-.dark .w-full.flex.items-center.justify-center.px-8.py-3.border.border-transparent.text-base.font-medium.rounded-md.text-indigo-600.bg-white.hover\\:bg-gray-50.md\\:py-4.md\\:text-lg.md\\:px-10 {
-    background-color: #1f2937;
-    color: #a5b4fc;
-}
-
-.dark .w-full.flex.items-center.justify-center.px-8.py-3.border.border-transparent.text-base.font-medium.rounded-md.text-indigo-600.bg-white.hover\\:bg-gray-50.md\\:py-4.md\\:text-lg.md\\:px-10:hover {
-    background-color: #374151;
-}
-
-/* View request page */
-.dark .bg-gray-50.px-4.py-5.sm\\:grid.sm\\:grid-cols-3.sm\\:gap-4.sm\\:px-6 {
-    background-color: #111827;
-}
-
-.dark .bg-white.px-4.py-5.sm\\:grid.sm\\:grid-cols-3.sm\\:gap-4.sm\\:px-6 {
-    background-color: #1f2937;
-}
-
-/* Button styles for consistent coloring */
-.dark .inline-flex.items-center.px-4.py-2.border.border-gray-300.shadow-sm.text-sm.font-medium.rounded-md.text-gray-700.bg-white.hover\\:bg-gray-50 {
-    background-color: #1f2937;
-    border-color: #4b5563;
-    color: #e5e7eb;
-}
-
-.dark .inline-flex.items-center.px-4.py-2.border.border-gray-300.shadow-sm.text-sm.font-medium.rounded-md.text-gray-700.bg-white.hover\\:bg-gray-50:hover {
-    background-color: #374151;
-}
-
-.dark .text-base.text-gray-500.sm\\:text-lg.md\\:mt-5.md\\:text-xl.md\\:max-w-3xl {
-    color: #9ca3af;
-}
-
-/* Make sure we don't miss any white backgrounds */
-.dark .bg-white {
-    background-color: #1f2937;
-}
-
-.dark .hover\\:bg-gray-50:hover {
-    background-color: #374151;
-}
-
-/* Additional consistency fixes */
-.dark .border-gray-300 {
-    border-color: #4b5563;
-}
-
-.dark .ring-black {
-    --tw-ring-color: rgba(0, 0, 0, 0.7);
+  background: #1e3a8a;
+}
+
+/*----------------------------------------------*\
+  SPECIFIC PAGES AND COMPONENTS
+\*----------------------------------------------*/
+
+/* Login container */
+.login-container {
+  background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path fill="%231E40AF" fill-opacity="0.05" d="M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5z"></path></svg>');
+}
+
+.university-emblem {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background-color: rgba(30, 64, 175, 0.03);
+  border-radius: 50%;
+  top: 20%;
+  right: -150px;
+  z-index: 0;
+}
+
+.university-emblem:before {
+  content: "";
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  background-color: rgba(30, 64, 175, 0.02);
+  border-radius: 50%;
+  top: 50px;
+  left: -100px;
+}
+
+/* Submit OD Form */
+.form-step {
+  border-left: 4px solid #1E40AF;
+  padding-left: 1rem;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.form-step::before {
+  content: '';
+  position: absolute;
+  left: -10px;
+  top: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #1E40AF;
+}
+
+.form-step-number {
+  position: absolute;
+  left: -10px;
+  top: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #1E40AF;
+  color: white;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
