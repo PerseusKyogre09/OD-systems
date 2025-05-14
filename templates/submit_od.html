@@ -1,75 +1,80 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Submit OD</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #f9f9f9;
-            min-width: 160px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 1;
-        }
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
-        label {
-            padding: 8px 12px;
-            cursor: pointer;
-            display: block;
-        }
-        input[type="checkbox"] {
-            margin-right: 8px;
-        }
-        form {
-            margin-top: 20px;
-        }
-    </style>
-</head>
-<body>
+{% extends "base.html" %}
 
-<h2>Submit Your OD</h2>
-<form action="/submit_od" method="POST">
-    <label for="name">Name:</label>
-    <input type="text" id="name" name="name" required><br><br>
-    
-    <label for="email">Email:</label>
-    <input type="email" id="email" name="email" required><br><br>
+{% block title %}Submit On-Duty Request{% endblock %}
 
-    <label for="od_reason">Reason for OD:</label>
-    <textarea id="od_reason" name="od_reason" rows="4" cols="50" required></textarea><br><br>
-    
-    <h2>Concerned Teachers</h2>
-    <div class="dropdown">
-        <button type="button">Select Teachers</button>
-        <div class="dropdown-content">
-            <label><input type="checkbox" name="teachers" value="Mrs. Kalpana Patel"> HOD first year</label>
-            <label><input type="checkbox" name="teachers" value="Mrs. Sandhya Rani Verma"> Class Mentor</label>
-            <label><input type="checkbox" name="teachers" value="Mr. Nishant Srivastava"> Programming</label>
-            <label><input type="checkbox" name="teachers" value="Mrs. Pallavi Jain"> Chemistry</label>
-            <label><input type="checkbox" name="teachers" value="Mr. Santosh Rai"> Philosophy</label>
-            <label><input type="checkbox" name="teachers" value="Mr. Vipin Kumar Verma"> Mathematics</label>
-            <label><input type="checkbox" name="teachers" value="Mr. Maniram Kumar"> Graphics</label>
-            <label><input type="checkbox" name="teachers" value="Mrs. Sonia Pal"> Yoga</label>
-            <label><input type="checkbox" name="teachers" value="Mrs. Shweta Gupta"> PDM</label>
-            <label><input type="checkbox" name="teachers" value="Mrs. Kamakshi Saksena"> Biology</label>
-        </div>
+{% block content %}
+<div class="min-h-screen py-12 sm:px-6 lg:px-8" data-cue="fadeIn">
+    <div class="sm:mx-auto sm:w-full sm:max-w-2xl">
+        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Submit On-Duty Request
+        </h2>
+        <p class="mt-2 text-center text-sm text-gray-600">
+            Please fill in the details below
+        </p>
     </div>
 
-    <br><br>
-    <input type="submit" value="Submit">
-</form>
+    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-2xl">
+        <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10" data-cue="slideUp">
+            <form method="POST" action="{{ url_for('submit_od') }}" class="space-y-6" enctype="multipart/form-data">
+                {{ form.csrf_token }}
 
-</body>
-</html>
+                <div>
+                    {{ form.event_name.label(class="block text-sm font-medium text-gray-700") }}
+                    <div class="mt-1">
+                        {{ form.event_name(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", placeholder="Enter event name") }}
+                    </div>
+                    {% if form.event_name.errors %}
+                        {% for error in form.event_name.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <div>
+                    {{ form.date.label(class="block text-sm font-medium text-gray-700") }}
+                    <div class="mt-1">
+                        {{ form.date(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", type="date") }}
+                    </div>
+                    {% if form.date.errors %}
+                        {% for error in form.date.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <div>
+                    {{ form.description.label(class="block text-sm font-medium text-gray-700") }}
+                    <div class="mt-1">
+                        {{ form.description(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", rows="4", placeholder="Describe the reason for your OD request") }}
+                    </div>
+                    {% if form.description.errors %}
+                        {% for error in form.description.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <div>
+                    {{ form.document.label(class="block text-sm font-medium text-gray-700") }}
+                    <div class="mt-1">
+                        {{ form.document(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm") }}
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500">Upload any supporting documents (PDF, DOC)</p>
+                    {% if form.document.errors %}
+                        {% for error in form.document.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <div>
+                    <button type="submit"
+                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
+                        Submit Request
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
