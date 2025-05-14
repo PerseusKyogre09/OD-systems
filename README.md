@@ -1,12 +1,24 @@
 # Online OD (On-Duty) Management System
 
-This project is an Online OD (On-Duty) Management System built with Flask. It enables students to submit OD requests, which can be reviewed and approved or rejected by teachers. The system includes features like user authentication, email notifications, and separate dashboards for students and teachers.
+This project is an Online OD (On-Duty) Management System built with Flask, Tailwind CSS, and modern JavaScript. It enables students to submit OD requests, which can be reviewed and approved or rejected by teachers. The system includes features like user authentication, email notifications, and separate dashboards for students and teachers.
+
+## Technologies Used
+
+- **Backend**: Flask (Python)
+- **Database**: MySQL
+- **Frontend**: 
+  - Tailwind CSS for styling
+  - ScrollCue.js for animations
+  - Custom JavaScript for interactivity
+- **Security**: 
+  - Flask-Login for authentication
+  - Werkzeug for password hashing
+  - CSRF protection
 
 ## Team Matrix
 This project was created by **Team Matrix**:
 - **Team Leader**: [Pradeepto Pal](https://github.com/PerseusKyogre09)
 - **Frontend Developer**: [Shivaditya](https://github.com/SHIVADITYA2005)
-- **Database Handler**: [Vansh Rattan](https://github.com/rattanvansh)
 
 ![Team Matrix](https://imgur.com/Xe6GCKB.png)
 
@@ -16,6 +28,17 @@ This project was a collective effort for **B Inventors**, a hackathon organized 
 Please see the LICENSE.md for terms and conditions.
 
 ## Features
+
+### Core Features
+- 🎨 Modern, responsive UI with Tailwind CSS
+- ✨ Smooth animations with ScrollCue.js
+- 🔒 Secure authentication system with role-based access (Students and Teachers)
+- 📑 Easy OD request submission with file attachments
+- 📝 Real-time status tracking
+- 💬 Comment system for discussion
+- 📧 Email notifications
+- 📊 Dashboard with statistics
+
 1. User Authentication: Registration, login, and logout functionalities with role-based access control for students and teachers.
 2. Role-Based Dashboards: Separate views for students and teachers:
 - Student Dashboard: Submit new OD requests.

@@ -33,8 +33,11 @@
     <nav class="bg-white shadow-lg">
         <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
             <div class="relative flex items-center justify-between h-16">
-                <div class="flex-1 flex items-center justify-between">
-                    <div class="flex-shrink-0">
+                <div class="flex-1 flex items-center justify-between">                    <div class="flex-shrink-0 flex items-center space-x-4">
+                        <a href="https://www.srmist.edu.in" target="_blank" class="flex-shrink-0">
+                            <img src="{{ url_for('static', filename='images/srm.jpg') }}" alt="SRM Logo" class="h-8 w-auto">
+                        </a>
+                        <div class="h-6 w-px bg-gray-300"></div>
                         <a href="{{ url_for('index') }}" class="flex items-center">
                             <i class="fas fa-calendar-check text-indigo-600 text-2xl mr-2"></i>
                             <span class="font-bold text-xl text-gray-800">OD System</span>
