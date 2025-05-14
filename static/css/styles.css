@@ -1,4 +1,220 @@
-/* Custom animations */
+/* Theme variables and base styles */
+:root {
+    --theme-transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Smooth transitions for theme changes */
+body,
+nav,
+header,
+main,
+footer,
+.card,
+button,
+input,
+select,
+textarea {
+    transition: var(--theme-transition);
+}
+
+/* Dark mode styles */
+.dark {
+    color-scheme: dark;
+}
+
+.dark body {
+    background-color: #111827;
+    color: #f3f4f6;
+}
+
+/* Dark mode refinements */
+.dark body {
+    background-color: #111827;
+    color: #e5e7eb;
+}
+
+/* Content boxes in dashboard pages */
+.dark .bg-white {
+    background-color: #1f2937;
+}
+
+.dark .text-gray-900 {
+    color: #f3f4f6;
+}
+
+.dark .text-gray-700,
+.dark .text-gray-600,
+.dark .text-gray-500 {
+    color: #d1d5db;
+}
+
+/* Form labels in dark mode */
+.dark .block.text-sm.font-medium.text-gray-700 {
+    color: #e5e7eb;
+}
+
+/* Dashboard card elements */
+.dark .px-4.py-5.bg-white.shadow.rounded-lg,
+.dark .bg-white.py-8.px-4.shadow.sm\:rounded-lg,
+.dark .bg-white.py-8.px-4.shadow.sm\:rounded-lg.sm\:px-10 {
+    background-color: #1f2937;
+    border-color: #374151;
+}
+
+/* Table headers in dark mode */
+.dark .bg-gray-50 {
+    background-color: #111827;
+}
+
+.dark .bg-gray-50 th {
+    color: #f3f4f6;
+}
+
+/* Table rows in dark mode */
+.dark .divide-y.divide-gray-200.bg-white {
+    background-color: #1f2937;
+}
+
+.dark .divide-y.divide-gray-200.bg-white tr {
+    border-color: #374151;
+}
+
+.dark .divide-y.divide-gray-300 {
+    border-color: #374151;
+}
+
+/* Links in tables */
+.dark .text-indigo-600 {
+    color: #a5b4fc;
+}
+
+.dark .text-indigo-600:hover {
+    color: #818cf8;
+}
+
+/* Status badges refinements for dark mode */
+.dark input,
+.dark select,
+.dark textarea {
+    background-color: #374151;
+    border-color: #4b5563;
+    color: #e5e7eb;
+}
+
+.dark input:focus,
+.dark select:focus,
+.dark textarea:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+/* Dark mode form and button styles */
+.dark input[type="text"],
+.dark input[type="email"],
+.dark input[type="password"],
+.dark input[type="number"],
+.dark input[type="date"],
+.dark select,
+.dark textarea {
+    background-color: #1f2937;
+    border-color: #374151;
+    color: #f3f4f6;
+}
+
+.dark input[type="text"]:focus,
+.dark input[type="email"]:focus,
+.dark input[type="password"]:focus,
+.dark input[type="number"]:focus,
+.dark input[type="date"]:focus,
+.dark select:focus,
+.dark textarea:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+    outline: none;
+}
+
+.dark input[type="text"]::placeholder,
+.dark input[type="email"]::placeholder,
+.dark input[type="password"]::placeholder,
+.dark input[type="number"]::placeholder,
+.dark textarea::placeholder {
+    color: #9ca3af;
+}
+
+/* Input placeholders */
+.dark .placeholder-gray-400::placeholder {
+    color: #9ca3af;
+}
+
+.dark .btn-primary {
+    background-color: #4f46e5;
+    color: #ffffff;
+}
+
+.dark .btn-primary:hover {
+    background-color: #4338ca;
+}
+
+.dark .btn-secondary {
+    background-color: #374151;
+    color: #ffffff;
+    border-color: #4b5563;
+}
+
+.dark .btn-secondary:hover {
+    background-color: #4b5563;
+}
+
+.dark .btn-danger {
+    background-color: #dc2626;
+    color: #ffffff;
+}
+
+.dark .btn-danger:hover {
+    background-color: #b91c1c;
+}
+
+.dark .card {
+    background-color: #1f2937;
+    border-color: #374151;
+}
+
+.dark .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+}
+
+.dark .shadow-lg {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark mode table styles */
+.dark table {
+    background-color: #1f2937;
+    border-color: #374151;
+}
+
+.dark table th {
+    background-color: #111827;
+    color: #f3f4f6;
+    border-color: #374151;
+}
+
+.dark table td {
+    border-color: #374151;
+    color: #d1d5db;
+}
+
+.dark table tbody tr:hover {
+    background-color: #374151;
+}
+
+/* Table cell background hover */
+.dark tbody tr:hover {
+    background-color: #374151;
+}
+
+/* Animations */
 .fade-in {
     animation: fadeIn 0.5s ease-in;
 }
@@ -138,6 +354,22 @@
 .status-badge--rejected {
     background-color: #fee2e2;
     color: #991b1b;
+}
+
+/* Dark mode status badges */
+.dark .status-badge--pending {
+    background-color: #854d0e;
+    color: #fef3c7;
+}
+
+.dark .status-badge--approved {
+    background-color: #065f46;
+    color: #d1fae5;
+}
+
+.dark .status-badge--rejected {
+    background-color: #991b1b;
+    color: #fee2e2;
 }
 
 /* Custom button styles */
@@ -281,6 +513,24 @@
     background: #555;
 }
 
+/* Dark mode scrollbar */
+.dark ::-webkit-scrollbar {
+    width: 10px;
+}
+
+.dark ::-webkit-scrollbar-track {
+    background: #1f2937;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background: #4b5563;
+    border-radius: 5px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+}
+
 /* Utility classes */
 .transition-smooth {
     transition: all 0.3s ease;
@@ -326,4 +576,355 @@ button {
     transform: translateY(-2px);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1),
                 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* Dark mode card styles */
+.dark .card {
+    background-color: #1f2937;
+    border-color: #374151;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
+
+.dark .card:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+}
+
+/* Theme transition */
+:root {
+    --theme-transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+body,
+nav,
+footer,
+.bg-white,
+.text-gray-600,
+.text-gray-800,
+.text-gray-500,
+.border-gray-200 {
+    transition: var(--theme-transition);
+}
+
+/* Theme transitions */
+.theme-transition,
+body,
+header,
+nav,
+main,
+footer,
+input,
+select,
+textarea,
+button,
+.card,
+.btn {
+    transition-property: background-color, border-color, color, box-shadow;
+    transition-duration: 200ms;
+    transition-timing-function: ease-in-out;
+}
+
+/* Don't animate images */
+img {
+    transition: none !important;
+}
+
+/* Transition durations for smooth theme changes */
+.transition-theme {
+    transition-property: background-color, border-color, color, box-shadow;
+    transition-timing-function: ease-in-out;
+    transition-duration: 200ms;
+}
+
+/* Improved dark mode styles */
+html.dark {
+    color-scheme: dark;
+}
+
+html.dark body {
+    background-color: #111827;
+    color: #f9fafb;
+}
+
+/* Navigational elements */
+html.dark nav {
+    background-color: #1f2937;
+    border-color: #374151;
+}
+
+/* Form inputs */
+html.dark input,
+html.dark select,
+html.dark textarea {
+    background-color: #1f2937;
+    border-color: #374151;
+    color: #f3f4f6;
+}
+
+html.dark input:focus,
+html.dark select:focus,
+html.dark textarea:focus {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.3);
+}
+
+/* Buttons */
+html.dark button,
+html.dark .btn {
+    background-color: #1f2937;
+    color: #f9fafb;
+    border-color: #374151;
+}
+
+html.dark button:hover,
+html.dark .btn:hover {
+    background-color: #374151;
+}
+
+html.dark button.btn-primary,
+html.dark .btn-primary {
+    background-color: #4f46e5;
+    color: #ffffff;
+}
+
+html.dark button.btn-primary:hover,
+html.dark .btn-primary:hover {
+    background-color: #4338ca;
+}
+
+/* Tables */
+html.dark table {
+    background-color: #1f2937;
+    color: #f9fafb;
+    border-color: #374151;
+}
+
+html.dark th {
+    background-color: #111827;
+    color: #f9fafb;
+    border-color: #374151;
+}
+
+html.dark td {
+    border-color: #374151;
+}
+
+html.dark tr:hover {
+    background-color: #374151;
+}
+
+/* Cards and panels */
+html.dark .card,
+html.dark .panel {
+    background-color: #1f2937;
+    border-color: #374151;
+    color: #f9fafb;
+}
+
+html.dark .card-header,
+html.dark .panel-header {
+    background-color: #111827;
+    border-color: #374151;
+}
+
+/* Shadows in dark mode */
+html.dark .shadow-md,
+html.dark .shadow-lg {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+}
+
+/* Status badges in dark mode */
+html.dark .status-badge--pending {
+    background-color: #78350f;
+    color: #fde68a;
+}
+
+html.dark .status-badge--approved {
+    background-color: #065f46;
+    color: #a7f3d0;
+}
+
+html.dark .status-badge--rejected {
+    background-color: #991b1b;
+    color: #fecaca;
+}
+
+/* Transitions for theme switching */
+body, nav, main, footer, header,
+button, input, select, textarea, 
+.card, .panel, .btn, table, th, td {
+    transition: background-color 0.3s ease, 
+                color 0.3s ease, 
+                border-color 0.3s ease, 
+                box-shadow 0.3s ease;
+}
+
+/* Fix text color in dashboard heading */
+.dark .text-3xl.font-extrabold.text-gray-900,
+.dark .text-3xl.font-extrabold.text-gray-900.sm\:text-4xl {
+    color: #f3f4f6;
+}
+
+/* Fix subtitle text color on dashboard */
+.dark .text-xl.text-gray-500 {
+    color: #9ca3af;
+}
+
+/* Fix heading in the Recent Requests section */
+.dark .text-lg.leading-6.font-medium.text-gray-900 {
+    color: #f3f4f6;
+}
+
+/* Fix sub-heading in the Recent Requests section */
+.dark .mt-2.text-sm.text-gray-700 {
+    color: #d1d5db;
+}
+
+/* Table dividers */
+.dark .shadow.ring-1.ring-black.ring-opacity-5.md\:rounded-lg {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --tw-ring-color: rgba(0, 0, 0, 0.3);
+}
+
+/* Dashboard stats and cards improvements */
+.dark .text-yellow-500 {
+    color: #fcd34d;
+}
+
+.dark .text-green-500 {
+    color: #10b981;
+}
+
+.dark .text-blue-500 {
+    color: #3b82f6;
+}
+
+.dark .text-indigo-500 {
+    color: #6366f1;
+}
+
+/* Text in table cells */
+.dark .whitespace-nowrap.px-3.py-4.text-sm.text-gray-500 {
+    color: #9ca3af;
+}
+
+.dark .font-medium.text-gray-900 {
+    color: #f3f4f6;
+}
+
+.dark .text-gray-500 {
+    color: #9ca3af;
+}
+
+/* Card shadows in dark mode */
+.dark .shadow {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Statuses */
+.dark .inline-flex.rounded-full.bg-yellow-100.px-2.text-xs.font-semibold.leading-5.text-yellow-800 {
+    background-color: #78350f;
+    color: #fef3c7;
+}
+
+.dark .inline-flex.rounded-full.bg-green-100.px-2.text-xs.font-semibold.leading-5.text-green-800 {
+    background-color: #065f46;
+    color: #d1fae5;
+}
+
+.dark .inline-flex.rounded-full.bg-red-100.px-2.text-xs.font-semibold.leading-5.text-red-800 {
+    background-color: #991b1b;
+    color: #fee2e2;
+}
+
+/* Background colors for view pages */
+.dark .relative.bg-white.overflow-hidden {
+    background-color: #1f2937;
+}
+
+/* Dividers in forms and cards */
+.dark .border-t.border-gray-300,
+.dark .border-t {
+    border-color: #374151;
+}
+
+/* Text colors in forms */
+.dark .text-center.text-sm.text-gray-600,
+.dark .mt-2.text-center.text-sm.text-gray-600 {
+    color: #9ca3af;
+}
+
+/* Fix for form submission page */
+.dark .px-2.bg-white.text-gray-500 {
+    background-color: #1f2937;
+    color: #9ca3af;
+}
+
+/* Index page styles for dark mode */
+.dark .text-4xl.tracking-tight.font-extrabold.text-gray-900 {
+    color: #f3f4f6;
+}
+
+.dark .text-4xl.tracking-tight.font-extrabold.text-gray-900.sm\\:text-5xl.md\\:text-6xl {
+    color: #f3f4f6;
+}
+
+/* Feature section on index page */
+.dark .mt-2.text-3xl.leading-8.font-extrabold.tracking-tight.text-gray-900.sm\\:text-4xl {
+    color: #f3f4f6;
+}
+
+.dark .text-lg.leading-6.font-medium.text-gray-900 {
+    color: #f3f4f6;
+}
+
+/* Buttons in index page */
+.dark .w-full.flex.items-center.justify-center.px-8.py-3.border.border-transparent.text-base.font-medium.rounded-md.text-indigo-600.bg-white.hover\\:bg-gray-50.md\\:py-4.md\\:text-lg.md\\:px-10 {
+    background-color: #1f2937;
+    color: #a5b4fc;
+}
+
+.dark .w-full.flex.items-center.justify-center.px-8.py-3.border.border-transparent.text-base.font-medium.rounded-md.text-indigo-600.bg-white.hover\\:bg-gray-50.md\\:py-4.md\\:text-lg.md\\:px-10:hover {
+    background-color: #374151;
+}
+
+/* View request page */
+.dark .bg-gray-50.px-4.py-5.sm\\:grid.sm\\:grid-cols-3.sm\\:gap-4.sm\\:px-6 {
+    background-color: #111827;
+}
+
+.dark .bg-white.px-4.py-5.sm\\:grid.sm\\:grid-cols-3.sm\\:gap-4.sm\\:px-6 {
+    background-color: #1f2937;
+}
+
+/* Button styles for consistent coloring */
+.dark .inline-flex.items-center.px-4.py-2.border.border-gray-300.shadow-sm.text-sm.font-medium.rounded-md.text-gray-700.bg-white.hover\\:bg-gray-50 {
+    background-color: #1f2937;
+    border-color: #4b5563;
+    color: #e5e7eb;
+}
+
+.dark .inline-flex.items-center.px-4.py-2.border.border-gray-300.shadow-sm.text-sm.font-medium.rounded-md.text-gray-700.bg-white.hover\\:bg-gray-50:hover {
+    background-color: #374151;
+}
+
+.dark .text-base.text-gray-500.sm\\:text-lg.md\\:mt-5.md\\:text-xl.md\\:max-w-3xl {
+    color: #9ca3af;
+}
+
+/* Make sure we don't miss any white backgrounds */
+.dark .bg-white {
+    background-color: #1f2937;
+}
+
+.dark .hover\\:bg-gray-50:hover {
+    background-color: #374151;
+}
+
+/* Additional consistency fixes */
+.dark .border-gray-300 {
+    border-color: #4b5563;
+}
+
+.dark .ring-black {
+    --tw-ring-color: rgba(0, 0, 0, 0.7);
 }

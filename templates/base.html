@@ -4,9 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% endblock %} - OD System</title>
-
+    
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            primary: '#1a1a1a',
+                            secondary: '#2d2d2d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>    <!-- Theme initialization -->
+    <script>
+        // Initialize theme immediately to prevent flash
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
     
     <!-- ScrollCue.js -->
     <link href="https://unpkg.com/scrollcue@latest/dist/scrollCue.min.css" rel="stylesheet">
@@ -25,61 +49,80 @@
         html {
             font-family: 'Inter var', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
         }
+        
+        /* Theme transition styles */
+        body,
+        nav,
+        header,
+        main,
+        footer,
+        .card,
+        .btn,
+        input,
+        select,
+        textarea {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
 
-<body class="bg-gray-100">
-    <nav class="bg-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
-            <div class="relative flex items-center justify-between h-16">
-                <div class="flex-1 flex items-center justify-between">                    <div class="flex-shrink-0 flex items-center space-x-4">
-                        <a href="https://www.srmist.edu.in" target="_blank" class="flex-shrink-0">
-                            <img src="{{ url_for('static', filename='images/srm.jpg') }}" alt="SRM Logo" class="h-8 w-auto">
-                        </a>
-                        <div class="h-6 w-px bg-gray-300"></div>
-                        <a href="{{ url_for('index') }}" class="flex items-center">
-                            <i class="fas fa-calendar-check text-indigo-600 text-2xl mr-2"></i>
-                            <span class="font-bold text-xl text-gray-800">OD System</span>
-                        </a>
-                    </div>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <!-- Navigation -->
+    <nav class="bg-white dark:bg-gray-800 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <!-- Logo section -->
+                <div class="flex items-center">
+                    <a href="https://www.srmist.edu.in" target="_blank" class="flex-shrink-0">
+                        <img src="{{ url_for('static', filename='images/srm.jpg') }}" alt="SRM Logo" class="h-8 w-auto">
+                    </a>
+                    <div class="h-6 w-px mx-4 bg-gray-200 dark:bg-gray-700"></div>
+                    <a href="{{ url_for('index') }}" class="flex items-center">
+                        <i class="fas fa-calendar-check text-indigo-600 dark:text-indigo-400 text-2xl mr-2"></i>
+                        <span class="font-bold text-xl text-gray-900 dark:text-white">OD System</span>
+                    </a>
+                </div>
+
+                <!-- Navigation links -->
+                <div class="flex items-center space-x-4">
                     {% if current_user.is_authenticated %}
-                    <div class="hidden sm:block sm:ml-6">
-                        <div class="flex space-x-4">
-                            {% if current_user.role == 'student' %}
+                        {% if current_user.role == 'student' %}
                             <a href="{{ url_for('student_dashboard') }}" 
-                               class="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
+                               class="text-gray-600 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
                                 Dashboard
                             </a>
                             <a href="{{ url_for('submit_od') }}"
-                               class="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
+                               class="text-gray-600 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
                                 Submit OD
                             </a>
-                            {% elif current_user.role == 'teacher' %}
+                        {% elif current_user.role == 'teacher' %}
                             <a href="{{ url_for('teacher_dashboard') }}"
-                               class="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
+                               class="text-gray-600 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
                                 Dashboard
                             </a>
-                            {% endif %}
-                            <a href="{{ url_for('logout') }}"
-                               class="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                                Logout
-                            </a>
-                        </div>
-                    </div>
+                        {% endif %}
+                    {% endif %}                    <!-- Theme toggle button -->
+                    <button id="theme-toggle" type="button" aria-label="Toggle dark mode"
+                            class="relative w-10 h-10 p-2 rounded-lg text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors duration-200">
+                        <i class="fas fa-sun text-lg" id="theme-toggle-light-icon"></i>
+                        <i class="fas fa-moon text-lg hidden" id="theme-toggle-dark-icon"></i>
+                    </button>
+
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('logout') }}"
+                           class="text-gray-600 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
+                            Logout
+                        </a>
                     {% else %}
-                    <div class="hidden sm:block sm:ml-6">
-                        <div class="flex space-x-4">
-                            <a href="{{ url_for('login') }}"
-                               class="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                                Login
-                            </a>
-                            <a href="{{ url_for('register') }}"
-                               class="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                                Register
-                            </a>
-                        </div>
-                    </div>
+                        <a href="{{ url_for('login') }}"
+                           class="text-gray-600 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
+                            Login
+                        </a>
+                        <a href="{{ url_for('register') }}"
+                           class="text-gray-600 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
+                            Register
+                        </a>
                     {% endif %}
                 </div>
             </div>
@@ -91,13 +134,13 @@
         {% if messages %}
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
                 {% for category, message in messages %}
-                    <div class="rounded-md p-4 mb-4 {% if category == 'error' %}bg-red-50 text-red-800{% elif category == 'success' %}bg-green-50 text-green-800{% else %}bg-blue-50 text-blue-800{% endif %} flex items-center justify-between" role="alert">
+                    <div class="rounded-md p-4 mb-4 {% if category == 'error' %}bg-red-50 dark:bg-red-900/50 text-red-800 dark:text-red-200{% elif category == 'success' %}bg-green-50 dark:bg-green-900/50 text-green-800 dark:text-green-200{% else %}bg-blue-50 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200{% endif %} flex items-center justify-between transition-colors duration-200" role="alert">
                         <div class="flex items-center">
-                            <i class="fas {% if category == 'error' %}fa-exclamation-circle text-red-400{% elif category == 'success' %}fa-check-circle text-green-400{% else %}fa-info-circle text-blue-400{% endif %} mr-3"></i>
+                            <i class="fas {% if category == 'error' %}fa-exclamation-circle text-red-500 dark:text-red-400{% elif category == 'success' %}fa-check-circle text-green-500 dark:text-green-400{% else %}fa-info-circle text-blue-500 dark:text-blue-400{% endif %} mr-3"></i>
                             <span class="text-sm font-medium">{{ message }}</span>
                         </div>
-                        <button type="button" class="ml-4 focus:outline-none" onclick="this.parentElement.remove()">
-                            <i class="fas fa-times text-gray-400 hover:text-gray-500"></i>
+                        <button type="button" class="ml-4 focus:outline-none transition-colors duration-200" onclick="this.parentElement.remove()">
+                            <i class="fas fa-times text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-400"></i>
                         </button>
                     </div>
                 {% endfor %}
@@ -106,39 +149,28 @@
     {% endwith %}
 
     <!-- Main content -->
-    <main class="pt-16">
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {% block content %}{% endblock %}
     </main>
 
     <!-- Footer -->
-    <footer class="bg-white border-t border-gray-200 mt-12">
+    <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-12">
         <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
             <div class="text-center">
-                <p class="text-gray-500 text-sm">&copy; 2025 OD System. All rights reserved.</p>
+                <p class="text-gray-500 dark:text-gray-400 text-sm">&copy; 2025 OD System. All rights reserved.</p>
             </div>
         </div>
-    </footer>
-
-    <!-- Scripts -->
+    </footer>    <!-- Application Scripts -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    {% block extra_js %}{% endblock %}
-
     <script>
-        // Initialize ScrollCue.js
-        scrollCue.init({
-            duration: 600,
-            interval: -100,
-            percentage: 0.75,
-            docSlider: false,
-            pageChangeReset: false
+        // Ensure theme is initialized when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize theme manager
+            if (window.ThemeManager) {
+                window.ThemeManager.init();
+            }
         });
-
-        // Flash message auto-dismiss
-        setTimeout(function() {
-            document.querySelectorAll('[role="alert"]').forEach(function(alert) {
-                alert.remove();
-            });
-        }, 5000);
     </script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>
