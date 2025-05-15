@@ -341,9 +341,23 @@ def view_request(request_id):
         cursor.execute(query, (request_id,))
     
     request = cursor.fetchone()
+    
     if not request:
         flash('Request not found or access denied.', 'danger')
         return redirect(url_for(f'{current_user.role}_dashboard'))
+    
+    # Get comments
+    query = """
+        SELECT c.*, u.name as author, DATE_FORMAT(c.created_at, '%%Y-%%m-%%d %%H:%%i') as formatted_date
+        FROM comments c
+        JOIN users u ON c.user_id = u.id
+        WHERE c.request_id = %s
+        ORDER BY c.created_at DESC
+    """
+    cursor.execute(query, (request_id,))
+    comments = cursor.fetchall()
+    
+    return render_template('view_request.html', request=request, comments=comments)
     
     # Get comments
     query = """
