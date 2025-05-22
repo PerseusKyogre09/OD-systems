@@ -219,16 +219,15 @@
                             {{ request.created_at }}
                         </div>
                     </div>
-                    
-                    <div class="timeline-item">
+                      <div class="timeline-item">
                         <div class="font-medium text-gray-900 dark:text-white">
                             Request {{ request.status }}
                         </div>                        <div class="text-sm text-gray-500 dark:text-gray-400">
-                            {{ request.decided_at }}
+                            {{ request.approved_at }}
                         </div>
                         <div class="mt-1 text-sm">
                             <span class="font-medium">Decision by:</span> 
-                            <span class="text-indigo-600 dark:text-indigo-400">{{ request.decided_by }}</span>
+                            <span class="text-indigo-600 dark:text-indigo-400">{{ request.approved_by }}</span>
                         </div>
                     </div>
                 </div>
