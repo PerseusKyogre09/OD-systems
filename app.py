@@ -1,16 +1,21 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, abort
+from flask import Flask, render_template, request, redirect, url_for, flash, abort, session, jsonify
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-import pymysql
-import smtplib
 import os
 import time
 from datetime import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import smtplib
 from forms import LoginForm, RegistrationForm, ODRequestForm, CommentForm
 from config import get_config
+from supabase_utils import (
+    sign_up_user, sign_in_user, sign_out_user, get_user,
+    insert_record, update_record, get_record, get_records, delete_record,
+    upload_file, get_file_url
+)
+from models import SupabaseUser
+import json
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -22,439 +27,535 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 login_manager.login_message_category = 'info'
 
-# Ensure upload folder exists
+# Ensure upload folder exists for temporary storage
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-
-# Initialize database connection
-conn = pymysql.connect(
-    host=app.config['DB_HOST'],
-    user=app.config['DB_USER'],
-    password=app.config['DB_PASSWORD'],
-    db=app.config['DB_NAME']
-)
-cursor = conn.cursor(pymysql.cursors.DictCursor)  # Use dictionary cursor for named fields
 
 # Helper Functions
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
-class User:
-    def __init__(self, id, email, role, name=None):
-        self.id = id
-        self.email = email
-        self.role = role
-        self.name = name
-
-    def is_authenticated(self):
-        return True
-
-    def is_active(self):
-        return True
-
-    def is_anonymous(self):
-        return False
-
-    def get_id(self):
-        return str(self.id)  # Flask-Login requires this to return a string
-
 @login_manager.user_loader
 def load_user(user_id):
-    query = "SELECT id, email, role, name FROM users WHERE id=%s"
-    cursor.execute(query, (user_id,))
-    result = cursor.fetchone()
-    if result:
-        return User(
-            id=result['id'],
-            email=result['email'],
-            role=result['role'],
-            name=result['name']
-        )
-    return None
+    """Load user by ID for Flask-Login."""
+    token = session.get('access_token')
+    if not token:
+        return None
+    
+    try:
+        user_response = get_user(token)
+        user_data = user_response['user']
+        return SupabaseUser(user_data)
+    except Exception as e:
+        app.logger.error(f"Error loading user: {str(e)}")
+        return None
 
 @app.route('/')
 def index():
-    return redirect(url_for('login'))
+    """Home page route."""
+    return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """Login route."""
     if current_user.is_authenticated:
-        return redirect(url_for(f'{current_user.role}_dashboard'))
+        return redirect_based_on_role()
 
     form = LoginForm()
     if form.validate_on_submit():
-        query = "SELECT id, name, email, password, role FROM users WHERE email=%s"
-        cursor.execute(query, (form.email.data,))
-        result = cursor.fetchone()
-
-        if not result or not check_password_hash(result['password'], form.password.data):
-            flash('Invalid email or password', 'error')
-            return render_template('login.html', form=form)
-
-        user = User(id=result['id'], name=result['name'], email=result['email'], role=result['role'])
-        login_user(user, remember=True)
-        next_page = request.args.get('next')
-        
-        if not next_page or not next_page.startswith('/'):
-            next_page = url_for(f'{user.role}_dashboard')
+        try:
+            app.logger.info(f"Attempting login for {form.email.data}")
             
-        flash('Login successful!', 'success')
-        return redirect(next_page)
-    
+            # Sign in with Supabase Auth
+            response = sign_in_user(form.email.data, form.password.data)
+            
+            app.logger.info(f"Login response received: {response}")
+            
+            # Check if there's an email confirmation error
+            if response.get('error') and response.get('email_confirmed') is False:
+                app.logger.warning(f"Email not confirmed for {form.email.data}")
+                flash('Please confirm your email address before logging in. Check your inbox for the confirmation link.', 'warning')
+                return render_template('login.html', form=form, email_confirmation_needed=True, email=form.email.data)
+            
+            if response and response.get('user'):
+                try:
+                    # Handle both dictionary and object response formats for session
+                    session_token = None
+                    
+                    # Get session data - might be a dictionary or object
+                    session_data = response.get('session')
+                    
+                    # Try to get the access token using different approaches
+                    if session_data:
+                        if isinstance(session_data, dict):
+                            # Dictionary approach
+                            session_token = session_data.get('access_token')
+                        elif hasattr(session_data, 'access_token'):
+                            # Object attribute approach
+                            session_token = session_data.access_token
+                            app.logger.info(f"Found access_token as attribute")
+                        else:
+                            # Direct handling for any format
+                            app.logger.info(f"Session data type: {type(session_data)}")
+                            app.logger.info(f"Session data dir: {dir(session_data)}")
+                            # Try to convert to string or extract the token directly
+                            if str(session_data) and 'token' in str(session_data).lower():
+                                app.logger.info(f"Raw session data: {str(session_data)}")
+                    
+                    if session_token:
+                        app.logger.info("Got access token, setting session")
+                        session['access_token'] = session_token
+                    else:
+                        app.logger.warning("No access token found in response")
+                    
+                    # Create user object from the response
+                    user_data = None
+                    user_obj = response.get('user')
+                    
+                    if isinstance(user_obj, dict):
+                        user_data = user_obj
+                    elif hasattr(user_obj, '__dict__'):
+                        # Try to convert object to dict
+                        try:
+                            user_data = vars(user_obj)
+                        except:
+                            pass
+                    
+                    if not user_data and hasattr(user_obj, 'id'):
+                        # Create minimal user data
+                        user_data = {'id': user_obj.id, 'email': getattr(user_obj, 'email', form.email.data)}
+                    
+                    user = SupabaseUser(user_data)
+                    login_user(user)
+                    
+                    app.logger.info(f"User logged in: {user.email}")
+                    
+                    # Redirect based on role
+                    return redirect_based_on_role()
+                    
+                except Exception as e:
+                    app.logger.error(f"Error processing login response: {str(e)}")
+                    flash('Error processing login information. Please try again.', 'danger')
+            else:                
+                app.logger.warning("Login failed - no user in response")
+                error_msg = "Login failed. "
+                
+                # If we have error details in the response
+                if isinstance(response, dict) and response.get('error'):
+                    error_msg = str(response.get('error'))
+                    
+                    # Special handling for email confirmation errors
+                    if "Email not confirmed" in error_msg:
+                        flash('Please confirm your email address before logging in. Check your inbox for the confirmation link.', 'warning')
+                        return render_template('login.html', form=form, email_confirmation_needed=True, email=form.email.data)                
+                    else:
+                        error_msg += "Please check your credentials."
+                    
+                flash(error_msg, 'danger')
+        except Exception as e:
+            error_str = str(e)
+            app.logger.error(f"Login error: {error_str}")
+            if "Could not find working sign-in method" in error_str:
+                flash('The login system is currently experiencing technical difficulties. Please try again later.', 'danger')
+            elif "Failed to sign in" in error_str:
+                if "sign_in_with_password" in error_str:
+                    flash('Invalid email or password. Please check your credentials and try again.', 'danger')
+                else:
+                    flash('Login failed. Please try again.', 'danger')
+            elif "For security purposes, you can only request this" in error_str:
+                flash('Too many login attempts. Please wait a minute before trying again.', 'warning')
+            elif "Email not confirmed" in error_str:
+                flash('Please confirm your email address before logging in. Check your inbox for the confirmation link.', 'warning')
+                return render_template('login.html', form=form, email_confirmation_needed=True, email=form.email.data)
+            else:
+                flash('An error occurred during login. Please try again.', 'danger')
+
     return render_template('login.html', form=form)
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if current_user.is_authenticated:
-        return redirect(url_for(f'{current_user.role}_dashboard'))
-
-    form = RegistrationForm()
-    if form.validate_on_submit():
-        cursor = conn.cursor(pymysql.cursors.DictCursor)
-        try:
-            name = form.name.data.strip()
-            email = form.email.data.strip().lower()
-            password = generate_password_hash(form.password.data)
-            role = form.role.data
-
-            # Check if email already exists
-            cursor.execute("SELECT id FROM users WHERE email=%s", (email,))
-            if cursor.fetchone():
-                flash('Email is already registered. Please log in or use a different email.', 'danger')
-                return redirect(url_for('login'))
-
-            # Insert new user
-            cursor.execute(
-                "INSERT INTO users (name, email, password, role) VALUES (%s, %s, %s, %s)",
-                (name, email, password, role)
-            )
-            conn.commit()
-
-            flash('Registration successful! You can now log in.', 'success')
-            return redirect(url_for('login'))
-
-        except pymysql.Error as e:
-            conn.rollback()
-            app.logger.error(f"Database error during registration: {str(e)}")
-            flash('A database error occurred. Please try again.', 'danger')
-        except Exception as e:
-            conn.rollback()
-            app.logger.error(f"Unexpected error during registration: {str(e)}")
-            flash('An unexpected error occurred. Please try again.', 'danger')
-        finally:
-            cursor.close()
-
-    return render_template('register.html', form=form)
-
-@app.route('/student_dashboard')
-@login_required
-def student_dashboard():
-    # Get pending requests count
-    cursor.execute("SELECT COUNT(*) FROM od_requests WHERE student_id = %s AND status = 'Pending'", (current_user.id,))
-    pending_count = cursor.fetchone()['COUNT(*)']
-
-    # Get approved requests count
-    cursor.execute("SELECT COUNT(*) FROM od_requests WHERE student_id = %s AND status = 'Approved'", (current_user.id,))
-    approved_count = cursor.fetchone()['COUNT(*)']
-
-    # Get total requests count
-    cursor.execute("SELECT COUNT(*) FROM od_requests WHERE student_id = %s", (current_user.id,))
-    total_count = cursor.fetchone()['COUNT(*)']
-
-    # Get recent requests
-    cursor.execute("""
-        SELECT id, event_name, date, status 
-        FROM od_requests 
-        WHERE student_id = %s 
-        ORDER BY date DESC 
-        LIMIT 5
-    """, (current_user.id,))
-    od_requests = cursor.fetchall()
-
-    return render_template('student_dashboard.html',
-                         pending_count=pending_count,
-                         approved_count=approved_count,
-                         total_count=total_count,
-                         od_requests=od_requests)
-
-@app.route('/teacher_dashboard')
-@login_required
-def teacher_dashboard():
-    if current_user.role != 'teacher':
-        flash('You are not authorized to access this page.', 'error')
-        return redirect(url_for('student_dashboard'))
-
-    # Get pending requests
-    cursor.execute("""
-        SELECT o.id, u.name as student_name, u.email, o.event_name, o.description, o.date 
-        FROM od_requests o
-        JOIN users u ON o.student_id = u.id
-        WHERE o.status = 'Pending' AND u.role = 'student'
-        ORDER BY o.date ASC
-    """)
-    od_requests = cursor.fetchall()
-
-    # Get pending count
-    cursor.execute("SELECT COUNT(*) FROM od_requests WHERE status = 'Pending'")
-    pending_count = cursor.fetchone()['COUNT(*)']
-
-    # Get today's requests count
-    cursor.execute("SELECT COUNT(*) FROM od_requests WHERE DATE(created_at) = CURDATE()")
-    todays_count = cursor.fetchone()['COUNT(*)']
-
-    # Get total actions (approved + rejected)
-    cursor.execute("SELECT COUNT(*) FROM od_requests WHERE status IN ('Approved', 'Rejected')")
-    total_actions = cursor.fetchone()['COUNT(*)']    # Add today's date for the dashboard
-    from datetime import datetime
-    today = datetime.now()
-    
-    return render_template('teacher_dashboard.html',
-                         od_requests=od_requests,
-                         pending_count=pending_count,
-                         todays_count=todays_count,
-                         total_actions=total_actions,
-                         today=today)
-
-@app.route('/submit_od', methods=['GET', 'POST'])
-@login_required
-def submit_od():
-    form = ODRequestForm()
-    if form.validate_on_submit():
-        event_name = form.event_name.data
-        date = form.date.data
-        description = form.description.data
+@app.route('/resend_verification', methods=['POST'])
+def resend_verification():
+    """Resend verification email route."""
+    email = request.form.get('email')
+    if not email:
+        if request.is_json:
+            data = request.get_json()
+            email = data.get('email')
         
-        # Handle file upload
-        document = None
-        if form.document.data:
-            file = form.document.data
-            if file.filename:
-                if allowed_file(file.filename):
-                    # Ensure the upload folder exists
-                    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-                    
-                    # Create a safe filename
-                    base = os.path.splitext(file.filename)[1]
-                    document = f"{current_user.id}_{int(time.time())}{base}"
-                    file_path = os.path.join(app.config['UPLOAD_FOLDER'], document)
-                    file.save(file_path)
-                else:
-                    flash('Invalid file type. Please upload a PDF or DOC file.', 'danger')
-                    return render_template('submit_od.html', form=form)
-
-        # Insert OD request into the database
-        query = """
-            INSERT INTO od_requests 
-            (student_id, event_name, date, description, document_path, status, created_at) 
-            VALUES (%s, %s, %s, %s, %s, 'Pending', NOW())
-        """
-        try:
-            cursor.execute(query, (current_user.id, event_name, date, description, document))
-            od_id = cursor.lastrowid
-            conn.commit()
-            
-            # Send email notification to teachers
-            notify_teachers(current_user.name, description, od_id)
-            
-            flash('Your OD request has been submitted successfully!', 'success')
-            return redirect(url_for('student_dashboard'))
-            
-        except Exception as e:
-            conn.rollback()
-            app.logger.error(f"Database error in submit_od: {str(e)}")
-            flash('An error occurred while submitting your request. Please try again.', 'danger')
+    if not email:
+        flash('Email address is required.', 'danger')
+        return redirect(url_for('login'))
     
-    return render_template('submit_od.html', form=form)
-
-def notify_teachers(student_name, description, od_id):
-    """Send email notifications to all teachers about a new OD request."""
     try:
-        # Get all teacher emails
-        cursor.execute("SELECT email FROM users WHERE role = 'teacher'")
-        teachers = cursor.fetchall()
+        # Use Supabase to resend the verification email
+        # This requires admin client permissions
+        from supabase_utils import get_supabase_admin_client
+        admin_client = get_supabase_admin_client()
         
-        for teacher in teachers:
-            subject = "New OD Request"
-            body = f"""
-            <html>
-            <body>
-                <p>Dear Teacher,</p>
-                <p>Student <strong>{student_name}</strong> has submitted a new OD request:</p>
-                <blockquote style="margin: 10px 0; padding: 10px; border-left: 3px solid #007bff; background-color: #f8f9fa;">
-                    {description}
-                </blockquote>
-                <p>Please review this request at your earliest convenience.</p>
-                <p>
-                    <a href="{url_for('view_request', request_id=od_id, _external=True)}" 
-                       style="display: inline-block; padding: 10px 20px; background-color: #007bff; 
-                              color: white; text-decoration: none; border-radius: 5px;">
-                        Review Request
-                    </a>
-                </p>
-                <p style="color: #666; font-size: 0.9em;">
-                    This is an automated message from the OD System.
-                </p>
-            </body>
-            </html>
-            """
-            
-            msg = MIMEMultipart("alternative")
-            msg['Subject'] = subject
-            msg['From'] = app.config['EMAIL_USER']
-            msg['To'] = teacher['email']
-            msg.attach(MIMEText(body, "html"))
-
-            with smtplib.SMTP('smtp.gmail.com', 587) as server:
-                server.starttls()
-                server.login(app.config['EMAIL_USER'], app.config['EMAIL_PASS'])
-                server.send_message(msg)
-                
-    except Exception as e:
-        app.logger.error(f"Email notification error: {str(e)}")
-        # Don't raise the exception - we don't want to fail the OD submission if email fails
-        pass
-
-@app.route('/view_request/<int:request_id>')
-@login_required
-def view_request(request_id):
-    # Get request details
-    if current_user.role == 'student':
-        query = """
-            SELECT r.*, u.name as student_name, u.email,
-                   d.name as decided_by, 
-                   DATE_FORMAT(r.updated_at, '%%Y-%%m-%%d %%H:%%i') as decided_at
-            FROM od_requests r
-            JOIN users u ON r.student_id = u.id
-            LEFT JOIN users d ON r.decided_by_id = d.id
-            WHERE r.id = %s AND r.student_id = %s
-        """
-        cursor.execute(query, (request_id, current_user.id))
-    else:  # teacher
-        query = """
-            SELECT r.*, u.name as student_name, u.email,
-                   d.name as decided_by,
-                   DATE_FORMAT(r.updated_at, '%%Y-%%m-%%d %%H:%%i') as decided_at
-            FROM od_requests r
-            JOIN users u ON r.student_id = u.id
-            LEFT JOIN users d ON r.decided_by_id = d.id
-            WHERE r.id = %s
-        """
-        cursor.execute(query, (request_id,))
-    
-    request = cursor.fetchone()
-    
-    if not request:
-        flash('Request not found or access denied.', 'danger')
-        return redirect(url_for(f'{current_user.role}_dashboard'))
-    
-    # Get comments
-    query = """
-        SELECT c.*, u.name as author, DATE_FORMAT(c.created_at, '%%Y-%%m-%%d %%H:%%i') as formatted_date
-        FROM comments c
-        JOIN users u ON c.user_id = u.id
-        WHERE c.request_id = %s
-        ORDER BY c.created_at DESC
-    """
-    cursor.execute(query, (request_id,))
-    comments = cursor.fetchall()
-    
-    return render_template('view_request.html', request=request, comments=comments)
-    
-    # Get comments
-    query = """
-        SELECT c.*, u.name as author, DATE_FORMAT(c.created_at, '%%Y-%%m-%%d %%H:%%i') as formatted_date
-        FROM comments c
-        JOIN users u ON c.user_id = u.id
-        WHERE c.request_id = %s
-        ORDER BY c.created_at DESC
-    """
-    cursor.execute(query, (request_id,))
-    comments = cursor.fetchall()
-    
-    return render_template('view_request.html', request=request, comments=comments)
-
-@app.route('/add_comment/<int:request_id>', methods=['POST'])
-@login_required
-def add_comment(request_id):
-    form = CommentForm()
-    if form.validate_on_submit():
-        content = form.comment.data
-        try:
-            query = """
-                INSERT INTO comments (request_id, user_id, content, created_at)
-                VALUES (%s, %s, %s, NOW())
-            """
-            cursor.execute(query, (request_id, current_user.id, content))
-            conn.commit()
-            flash('Comment added successfully.', 'success')
-        except Exception as e:
-            conn.rollback()
-            app.logger.error(f"Error adding comment: {str(e)}")
-            flash('An error occurred while adding your comment.', 'danger')
-    
-    return redirect(url_for('view_request', request_id=request_id))
-
-# Update approve_od route to include who approved
-@app.route('/approve_od/<int:od_id>', methods=['POST'])
-@login_required
-def approve_od(od_id):
-    if current_user.role != 'teacher':
-        flash('Unauthorized action.', 'danger')
-        return redirect(url_for('student_dashboard'))
+        # Use the admin.invite_user_by_email method if available
+        if hasattr(admin_client.auth, 'admin') and hasattr(admin_client.auth.admin, 'invite_user_by_email'):
+            admin_client.auth.admin.invite_user_by_email(email)
+            flash('Verification email has been resent. Please check your inbox.', 'success')
+        else:
+            # Fallback - sign up the user again which will resend the verification
+            # This is less ideal but works in many cases
+            # We'd need the original password which we don't have, so we notify the user
+            flash('Please try registering again with the same email to receive a new verification link.', 'info')
         
-    try:
-        query = """
-            UPDATE od_requests 
-            SET status = 'Approved', 
-                decided_by_id = %s,
-                updated_at = NOW() 
-            WHERE id = %s
-        """
-        cursor.execute(query, (current_user.id, od_id))
-        conn.commit()
-        flash('OD request approved successfully!', 'success')
     except Exception as e:
-        conn.rollback()
-        app.logger.error(f"Error approving OD: {str(e)}")
-        flash('An error occurred while processing your request.', 'danger')
+        app.logger.error(f"Error resending verification: {str(e)}")
+        flash('An error occurred while trying to resend the verification email.', 'danger')
     
-    return redirect(url_for('teacher_dashboard'))
-
-# Update reject_od route to include who rejected
-@app.route('/reject_od/<int:od_id>', methods=['POST'])
-@login_required
-def reject_od(od_id):
-    if current_user.role != 'teacher':
-        flash('Unauthorized action.', 'danger')
-        return redirect(url_for('student_dashboard'))
-        
-    try:
-        query = """
-            UPDATE od_requests 
-            SET status = 'Rejected', 
-                decided_by_id = %s,
-                updated_at = NOW() 
-            WHERE id = %s
-        """
-        cursor.execute(query, (current_user.id, od_id))
-        conn.commit()
-        flash('OD request rejected.', 'success')
-    except Exception as e:
-        conn.rollback()
-        app.logger.error(f"Error rejecting OD: {str(e)}")
-        flash('An error occurred while processing your request.', 'danger')
-    
-    return redirect(url_for('teacher_dashboard'))
+    return redirect(url_for('login'))
 
 @app.route('/logout')
 @login_required
 def logout():
+    """Logout route."""
+    token = session.get('access_token')
+    if token:
+        try:
+            sign_out_user(token)
+        except Exception as e:
+            app.logger.error(f"Logout error: {str(e)}")
+    
     logout_user()
-    return redirect(url_for('login'))
+    session.pop('access_token', None)
+    flash('You have been logged out.', 'info')
+    return redirect(url_for('index'))
 
-# Route to display team.html page
-@app.route('/team')
-def team():
-    return render_template('team.html')
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    """Registration route."""
+    if current_user.is_authenticated:
+        return redirect_based_on_role()
+    
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        try:
+            app.logger.info("Starting user registration process")
+            
+            # Create user in Supabase Auth
+            user_metadata = {
+                'name': form.name.data,
+                'role': form.role.data
+            }
+            
+            # Get the base URL for email redirect
+            base_url = request.host_url.rstrip('/')
+            redirect_url = f"{base_url}/login"
+            
+            app.logger.info(f"Attempting to register: {form.email.data} with role: {form.role.data}")
+            app.logger.info(f"Using redirect URL: {redirect_url}")
+            
+            # The sign_up_user function now handles all errors internally and returns a consistent structure
+            response = sign_up_user(
+                form.email.data, 
+                form.password.data, 
+                user_metadata,
+                redirect_url
+            )
+            
+            app.logger.info(f"Registration response received: {response}")
+            
+            # Check if response contains user data
+            if response and response.get('user'):
+                app.logger.info("Registration successful")
+                flash('Registration successful! Please check your email to verify your account.', 'success')
+                return redirect(url_for('login'))
+            else:
+                app.logger.warning("Registration failed - no user in response")
+                # Check logs for rate limit error message
+                if "For security purposes, you can only request this after" in str(response):
+                    flash('Too many attempts. Please wait for a minute before trying again.', 'warning')
+                else:
+                    flash('Registration failed. Please try again.', 'danger')
+        except Exception as e:
+            error_msg = str(e)
+            app.logger.error(f"Registration error: {error_msg}")
+            
+            # Check for specific error messages and provide more helpful feedback
+            if "security purposes" in error_msg and "request this after" in error_msg:
+                flash('Too many registration attempts. Please wait for a minute before trying again.', 'warning')
+            else:
+                flash('An error occurred during registration. Please try again.', 'danger')
+
+    return render_template('register.html', form=form)
+
+def redirect_based_on_role():
+    """Redirect user based on their role."""
+    if not current_user.is_authenticated:
+        return redirect(url_for('login'))
+    
+    if current_user.is_teacher():
+        return redirect(url_for('teacher_dashboard'))
+    else:
+        return redirect(url_for('student_dashboard'))
+
+@app.route('/student_dashboard')
+@login_required
+def student_dashboard():
+    """Student dashboard route."""
+    if not current_user.is_authenticated or current_user.is_teacher():
+        return redirect(url_for('login'))
+    
+    try:
+        # Get all OD requests for the current user - use admin client to bypass RLS
+        from supabase_utils import get_supabase_admin_client
+        admin_client = get_supabase_admin_client()
+        response = admin_client.table('od_requests').select('*').eq('student_id', current_user.id).execute()
+        od_requests = response.data
+    except Exception as e:
+        app.logger.error(f"Error fetching OD requests: {str(e)}")
+        od_requests = []
+    
+    return render_template('student_dashboard.html', od_requests=od_requests)
+
+@app.route('/teacher_dashboard')
+@login_required
+def teacher_dashboard():
+    """Teacher dashboard route."""
+    if not current_user.is_authenticated or not current_user.is_teacher():
+        return redirect(url_for('login'))
+    
+    try:
+        # Get all OD requests - use admin client to bypass RLS
+        from supabase_utils import get_supabase_admin_client
+        admin_client = get_supabase_admin_client()
+        response = admin_client.table('od_requests').select('*').execute()
+        od_requests = response.data
+    except Exception as e:
+        app.logger.error(f"Error fetching OD requests: {str(e)}")
+        od_requests = []
+    
+    return render_template('teacher_dashboard.html', od_requests=od_requests)
+
+@app.route('/submit_od', methods=['GET', 'POST'])
+@login_required
+def submit_od():
+    """Submit OD request route."""
+    if not current_user.is_authenticated or current_user.is_teacher():
+        return redirect(url_for('login'))
+    
+    form = ODRequestForm()
+    if form.validate_on_submit():
+        try:
+            # Upload document if provided
+            document_url = None
+            if form.document.data:
+                file = form.document.data
+                filename = secure_filename(file.filename)
+                temp_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                
+                # Save temporarily to local filesystem
+                file.save(temp_path)
+                
+                # Upload to Supabase Storage
+                timestamp = int(time.time())
+                file_key = f"{current_user.id}_{timestamp}_{filename}"
+                upload_file('od-documents', temp_path, file_key)
+                
+                # Get public URL
+                document_url = get_file_url('od-documents', file_key)
+                
+                # Remove temporary file
+                os.remove(temp_path)
+              # Insert OD request record
+            od_data = {
+                'event_name': form.event_name.data,
+                'date': form.date.data.isoformat(),
+                'description': form.description.data,
+                'document_url': document_url,
+                'student_id': current_user.id,
+                'student_name': current_user.name,
+                'student_email': current_user.email,
+                'status': 'pending',
+                'created_at': datetime.now().isoformat()
+            }
+            
+            # Use admin client for insert to bypass row-level security
+            from supabase_utils import get_supabase_admin_client
+            admin_client = get_supabase_admin_client()
+            response = admin_client.table('od_requests').insert(od_data).execute()
+            request_id = response.data[0]['id']
+            
+            # Notify teachers
+            notify_teachers(current_user.name, form.event_name.data, request_id)
+            
+            flash('OD request submitted successfully!', 'success')
+            return redirect(url_for('student_dashboard'))
+            
+        except Exception as e:
+            app.logger.error(f"Error submitting OD request: {str(e)}")
+            flash('An error occurred while submitting your request. Please try again.', 'danger')
+    
+    return render_template('submit_od.html', form=form)
+
+def notify_teachers(student_name, event_name, od_id):
+    """Send email notifications to all teachers about a new OD request."""
+    try:        # Get all teachers from Supabase - use admin client to bypass RLS
+        from supabase_utils import get_supabase_admin_client
+        admin_client = get_supabase_admin_client()
+        response = admin_client.table('teacher_notifications').select('*').execute()
+        teachers = response.data
+        
+        if not teachers:
+            app.logger.warning("No teachers found for notification")
+            return
+            
+        # Email setup
+        sender_email = app.config['MAIL_USERNAME']
+        sender_password = app.config['MAIL_PASSWORD']
+        
+        for teacher in teachers:
+            msg = MIMEMultipart()
+            msg['From'] = sender_email
+            msg['To'] = teacher['email']
+            msg['Subject'] = f"New OD Request from {student_name}"
+            
+            body = f"""
+            Dear Teacher,
+            
+            A new OD request has been submitted:
+            
+            Student: {student_name}
+            Event: {event_name}
+            
+            Please login to review this request:
+            {request.host_url}view_request/{od_id}
+            
+            Thank you,
+            OD System Admin
+            """
+            
+            msg.attach(MIMEText(body, 'plain'))
+            
+            # Send email
+            with smtplib.SMTP(app.config['MAIL_SERVER'], app.config['MAIL_PORT']) as server:
+                server.starttls()
+                server.login(sender_email, sender_password)
+                server.send_message(msg)
+                
+    except Exception as e:
+        app.logger.error(f"Error sending teacher notifications: {str(e)}")
+
+@app.route('/view_request/<string:request_id>')
+@login_required
+def view_request(request_id):
+    """View OD request details."""
+    try:
+        # Get OD request - use admin client to bypass RLS
+        from supabase_utils import get_supabase_admin_client
+        admin_client = get_supabase_admin_client()
+        od_response = admin_client.table('od_requests').select('*').eq('id', request_id).execute()
+        od_request = od_response.data[0] if od_response.data else None
+        
+        if not od_request:
+            flash('Request not found.', 'danger')
+            return redirect_based_on_role()
+            
+        # Check permissions        if not current_user.is_teacher() and od_request['student_id'] != current_user.id:
+            flash('You do not have permission to view this request.', 'danger')
+            return redirect_based_on_role()
+            
+        # Get comments - use admin client to bypass RLS
+        from supabase_utils import get_supabase_admin_client
+        admin_client = get_supabase_admin_client()
+        comments_response = admin_client.table('comments').select('*').eq('od_request_id', request_id).execute()
+        comments = comments_response.data
+        
+        # Create comment form
+        form = CommentForm()
+        
+        return render_template(
+            'view_request.html', 
+            request=od_request, 
+            comments=comments, 
+            form=form
+        )
+        
+    except Exception as e:
+        app.logger.error(f"Error viewing request: {str(e)}")
+        flash('An error occurred while retrieving the request.', 'danger')
+        return redirect_based_on_role()
+
+@app.route('/add_comment/<string:request_id>', methods=['POST'])
+@login_required
+def add_comment(request_id):
+    """Add a comment to an OD request."""
+    form = CommentForm()    
+    if form.validate_on_submit():
+        try:
+            comment_data = {
+                'od_request_id': request_id,
+                'user_id': current_user.id,
+                'user_name': current_user.name,
+                'user_role': current_user.role,
+                'content': form.content.data,
+                'created_at': datetime.now().isoformat()
+            }
+            
+            # Use admin client to bypass RLS
+            from supabase_utils import get_supabase_admin_client
+            admin_client = get_supabase_admin_client()
+            admin_client.table('comments').insert(comment_data).execute()
+            flash('Comment added successfully.', 'success')
+            
+        except Exception as e:
+            app.logger.error(f"Error adding comment: {str(e)}")
+            flash('An error occurred while adding your comment.', 'danger')
+            
+    return redirect(url_for('view_request', request_id=request_id))
+
+@app.route('/approve_od/<string:od_id>', methods=['GET', 'POST'])
+@login_required
+def approve_od(od_id):
+    """Approve an OD request."""
+    if not current_user.is_authenticated or not current_user.is_teacher():
+        flash('You do not have permission to approve requests.', 'danger')
+        return redirect(url_for('login'))
+        
+    try:
+        # Update OD request status - using admin client to bypass RLS
+        from supabase_utils import get_supabase_admin_client
+        admin_client = get_supabase_admin_client()
+        admin_client.table('od_requests').update({
+            'status': 'approved',
+            'approved_by': current_user.id,
+            'approved_at': datetime.now().isoformat()
+        }).eq('id', od_id).execute()
+        
+        flash('Request approved successfully.', 'success')
+        
+    except Exception as e:
+        app.logger.error(f"Error approving request: {str(e)}")
+        flash('An error occurred while approving the request.', 'danger')
+        
+    return redirect(url_for('view_request', request_id=od_id))
+
+@app.route('/reject_od/<string:od_id>', methods=['GET', 'POST'])
+@login_required
+def reject_od(od_id):
+    """Reject an OD request."""
+    if not current_user.is_authenticated or not current_user.is_teacher():
+        flash('You do not have permission to reject requests.', 'danger')
+        return redirect(url_for('login'))
+        
+    try:
+        # Update OD request status - using admin client to bypass RLS
+        from supabase_utils import get_supabase_admin_client
+        admin_client = get_supabase_admin_client()
+        admin_client.table('od_requests').update({
+            'status': 'rejected',
+            'approved_by': current_user.id,
+            'approved_at': datetime.now().isoformat()
+        }).eq('id', od_id).execute()
+        
+        flash('Request rejected.', 'info')
+        
+    except Exception as e:
+        app.logger.error(f"Error rejecting request: {str(e)}")
+        flash('An error occurred while rejecting the request.', 'danger')
+        
+    return redirect(url_for('view_request', request_id=od_id))
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=app.config['DEBUG'])

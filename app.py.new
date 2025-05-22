@@ -1,0 +1,396 @@
+from flask import Flask, render_template, request, redirect, url_for, flash, abort, session, jsonify
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from werkzeug.utils import secure_filename
+import os
+import time
+from datetime import datetime
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import smtplib
+from forms import LoginForm, RegistrationForm, ODRequestForm, CommentForm
+from config import get_config
+from supabase_utils import (
+    sign_up_user, sign_in_user, sign_out_user, get_user,
+    insert_record, update_record, get_record, get_records, delete_record,
+    upload_file, get_file_url
+)
+from models import SupabaseUser
+import json
+
+# Initialize Flask app
+app = Flask(__name__)
+app.config.from_object(get_config())
+
+# Initialize Flask-Login
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+login_manager.login_message_category = 'info'
+
+# Ensure upload folder exists for temporary storage
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+# Helper Functions
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+
+@login_manager.user_loader
+def load_user(user_id):
+    """Load user by ID for Flask-Login."""
+    token = session.get('access_token')
+    if not token:
+        return None
+    
+    try:
+        user_response = get_user(token)
+        user_data = user_response['user']
+        return SupabaseUser(user_data)
+    except Exception as e:
+        app.logger.error(f"Error loading user: {str(e)}")
+        return None
+
+@app.route('/')
+def index():
+    """Home page route."""
+    return render_template('index.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    """Login route."""
+    if current_user.is_authenticated:
+        return redirect_based_on_role()
+
+    form = LoginForm()
+    if form.validate_on_submit():
+        try:
+            # Sign in with Supabase Auth
+            response = sign_in_user(form.email.data, form.password.data)
+            
+            if response['user']:
+                # Store the access token in session
+                session['access_token'] = response['session']['access_token']
+                
+                # Create user object from the response
+                user = SupabaseUser(response['user'])
+                login_user(user)
+                
+                # Redirect based on role
+                return redirect_based_on_role()
+            else:
+                flash('Login failed. Please check your credentials.', 'danger')
+        except Exception as e:
+            app.logger.error(f"Login error: {str(e)}")
+            flash('An error occurred during login. Please try again.', 'danger')
+
+    return render_template('login.html', form=form)
+
+@app.route('/logout')
+@login_required
+def logout():
+    """Logout route."""
+    token = session.get('access_token')
+    if token:
+        try:
+            sign_out_user(token)
+        except Exception as e:
+            app.logger.error(f"Logout error: {str(e)}")
+    
+    logout_user()
+    session.pop('access_token', None)
+    flash('You have been logged out.', 'info')
+    return redirect(url_for('index'))
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    """Registration route."""
+    if current_user.is_authenticated:
+        return redirect_based_on_role()
+    
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        try:
+            # Create user in Supabase Auth
+            user_metadata = {
+                'name': form.name.data,
+                'role': form.role.data
+            }
+            
+            response = sign_up_user(
+                form.email.data, 
+                form.password.data, 
+                user_metadata
+            )
+            
+            if response['user']:
+                flash('Registration successful! Please check your email to verify your account.', 'success')
+                return redirect(url_for('login'))
+            else:
+                flash('Registration failed. Please try again.', 'danger')
+        except Exception as e:
+            app.logger.error(f"Registration error: {str(e)}")
+            flash('An error occurred during registration. Please try again.', 'danger')
+
+    return render_template('register.html', form=form)
+
+def redirect_based_on_role():
+    """Redirect user based on their role."""
+    if not current_user.is_authenticated:
+        return redirect(url_for('login'))
+    
+    if current_user.is_teacher():
+        return redirect(url_for('teacher_dashboard'))
+    else:
+        return redirect(url_for('student_dashboard'))
+
+@app.route('/student_dashboard')
+@login_required
+def student_dashboard():
+    """Student dashboard route."""
+    if not current_user.is_authenticated or current_user.is_teacher():
+        return redirect(url_for('login'))
+    
+    try:
+        # Get all OD requests for the current user
+        response = get_records('od_requests', {'student_id': current_user.id})
+        od_requests = response.data
+    except Exception as e:
+        app.logger.error(f"Error fetching OD requests: {str(e)}")
+        od_requests = []
+    
+    return render_template('student_dashboard.html', od_requests=od_requests)
+
+@app.route('/teacher_dashboard')
+@login_required
+def teacher_dashboard():
+    """Teacher dashboard route."""
+    if not current_user.is_authenticated or not current_user.is_teacher():
+        return redirect(url_for('login'))
+    
+    try:
+        # Get all OD requests
+        response = get_records('od_requests')
+        od_requests = response.data
+    except Exception as e:
+        app.logger.error(f"Error fetching OD requests: {str(e)}")
+        od_requests = []
+    
+    return render_template('teacher_dashboard.html', od_requests=od_requests)
+
+@app.route('/submit_od', methods=['GET', 'POST'])
+@login_required
+def submit_od():
+    """Submit OD request route."""
+    if not current_user.is_authenticated or current_user.is_teacher():
+        return redirect(url_for('login'))
+    
+    form = ODRequestForm()
+    if form.validate_on_submit():
+        try:
+            # Upload document if provided
+            document_url = None
+            if form.document.data:
+                file = form.document.data
+                filename = secure_filename(file.filename)
+                temp_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                
+                # Save temporarily to local filesystem
+                file.save(temp_path)
+                
+                # Upload to Supabase Storage
+                timestamp = int(time.time())
+                file_key = f"{current_user.id}_{timestamp}_{filename}"
+                upload_file('od-documents', temp_path, file_key)
+                
+                # Get public URL
+                document_url = get_file_url('od-documents', file_key)
+                
+                # Remove temporary file
+                os.remove(temp_path)
+            
+            # Insert OD request record
+            od_data = {
+                'event_name': form.event_name.data,
+                'date': form.date.data.isoformat(),
+                'description': form.description.data,
+                'document_url': document_url,
+                'student_id': current_user.id,
+                'student_name': current_user.name,
+                'student_email': current_user.email,
+                'status': 'pending',
+                'created_at': datetime.now().isoformat()
+            }
+            
+            response = insert_record('od_requests', od_data)
+            request_id = response.data[0]['id']
+            
+            # Notify teachers
+            notify_teachers(current_user.name, form.event_name.data, request_id)
+            
+            flash('OD request submitted successfully!', 'success')
+            return redirect(url_for('student_dashboard'))
+            
+        except Exception as e:
+            app.logger.error(f"Error submitting OD request: {str(e)}")
+            flash('An error occurred while submitting your request. Please try again.', 'danger')
+    
+    return render_template('submit_od.html', form=form)
+
+def notify_teachers(student_name, event_name, od_id):
+    """Send email notifications to all teachers about a new OD request."""
+    try:
+        # Get all teachers from Supabase
+        response = get_records('teacher_notifications')  # Assume we store teacher notification preferences
+        teachers = response.data
+        
+        if not teachers:
+            app.logger.warning("No teachers found for notification")
+            return
+            
+        # Email setup
+        sender_email = app.config['MAIL_USERNAME']
+        sender_password = app.config['MAIL_PASSWORD']
+        
+        for teacher in teachers:
+            msg = MIMEMultipart()
+            msg['From'] = sender_email
+            msg['To'] = teacher['email']
+            msg['Subject'] = f"New OD Request from {student_name}"
+            
+            body = f"""
+            Dear Teacher,
+            
+            A new OD request has been submitted:
+            
+            Student: {student_name}
+            Event: {event_name}
+            
+            Please login to review this request:
+            {request.host_url}view_request/{od_id}
+            
+            Thank you,
+            OD System Admin
+            """
+            
+            msg.attach(MIMEText(body, 'plain'))
+            
+            # Send email
+            with smtplib.SMTP(app.config['MAIL_SERVER'], app.config['MAIL_PORT']) as server:
+                server.starttls()
+                server.login(sender_email, sender_password)
+                server.send_message(msg)
+                
+    except Exception as e:
+        app.logger.error(f"Error sending teacher notifications: {str(e)}")
+
+@app.route('/view_request/<int:request_id>')
+@login_required
+def view_request(request_id):
+    """View OD request details."""
+    try:
+        # Get OD request
+        od_response = get_record('od_requests', request_id)
+        od_request = od_response.data[0] if od_response.data else None
+        
+        if not od_request:
+            flash('Request not found.', 'danger')
+            return redirect_based_on_role()
+            
+        # Check permissions
+        if not current_user.is_teacher() and od_request['student_id'] != current_user.id:
+            flash('You do not have permission to view this request.', 'danger')
+            return redirect_based_on_role()
+            
+        # Get comments
+        comments_response = get_records('comments', {'od_request_id': request_id})
+        comments = comments_response.data
+        
+        # Create comment form
+        form = CommentForm()
+        
+        return render_template(
+            'view_request.html', 
+            request=od_request, 
+            comments=comments, 
+            form=form
+        )
+        
+    except Exception as e:
+        app.logger.error(f"Error viewing request: {str(e)}")
+        flash('An error occurred while retrieving the request.', 'danger')
+        return redirect_based_on_role()
+
+@app.route('/add_comment/<int:request_id>', methods=['POST'])
+@login_required
+def add_comment(request_id):
+    """Add a comment to an OD request."""
+    form = CommentForm()
+    if form.validate_on_submit():
+        try:
+            comment_data = {
+                'od_request_id': request_id,
+                'user_id': current_user.id,
+                'user_name': current_user.name,
+                'user_role': current_user.role,
+                'content': form.content.data,
+                'created_at': datetime.now().isoformat()
+            }
+            
+            insert_record('comments', comment_data)
+            flash('Comment added successfully.', 'success')
+            
+        except Exception as e:
+            app.logger.error(f"Error adding comment: {str(e)}")
+            flash('An error occurred while adding your comment.', 'danger')
+            
+    return redirect(url_for('view_request', request_id=request_id))
+
+@app.route('/approve_request/<int:request_id>')
+@login_required
+def approve_request(request_id):
+    """Approve an OD request."""
+    if not current_user.is_authenticated or not current_user.is_teacher():
+        flash('You do not have permission to approve requests.', 'danger')
+        return redirect(url_for('login'))
+        
+    try:
+        # Update OD request status
+        update_record('od_requests', request_id, {
+            'status': 'approved',
+            'approved_by': current_user.id,
+            'approved_at': datetime.now().isoformat()
+        })
+        
+        flash('Request approved successfully.', 'success')
+        
+    except Exception as e:
+        app.logger.error(f"Error approving request: {str(e)}")
+        flash('An error occurred while approving the request.', 'danger')
+        
+    return redirect(url_for('view_request', request_id=request_id))
+
+@app.route('/reject_request/<int:request_id>')
+@login_required
+def reject_request(request_id):
+    """Reject an OD request."""
+    if not current_user.is_authenticated or not current_user.is_teacher():
+        flash('You do not have permission to reject requests.', 'danger')
+        return redirect(url_for('login'))
+        
+    try:
+        # Update OD request status
+        update_record('od_requests', request_id, {
+            'status': 'rejected',
+            'approved_by': current_user.id,
+            'approved_at': datetime.now().isoformat()
+        })
+        
+        flash('Request rejected.', 'info')
+        
+    except Exception as e:
+        app.logger.error(f"Error rejecting request: {str(e)}")
+        flash('An error occurred while rejecting the request.', 'danger')
+        
+    return redirect(url_for('view_request', request_id=request_id))
+
+if __name__ == '__main__':
+    app.run(debug=app.config['DEBUG'])

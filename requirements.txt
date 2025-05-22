@@ -1,6 +1,5 @@
 Flask==3.0.0
 Flask-Login==0.6.3
-PyMySQL==1.1.0
 Werkzeug==3.0.1
 python-dotenv==1.0.0
 cryptography==41.0.7
@@ -8,3 +7,7 @@ flask-assets==2.1.0
 email-validator==2.1.0.post1
 Flask-WTF==1.2.1
 Pillow==10.1.0  # for image handling
+supabase==1.2.0  # Supabase Python client
+psycopg2-binary==2.9.9  # PostgreSQL adapter
+python-jose==3.3.0  # JWT handling
+httpx==0.24.1  # Specific version required by supabase

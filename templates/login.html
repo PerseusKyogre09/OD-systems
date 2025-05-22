@@ -52,7 +52,24 @@
             <div class="college-card-header">
                 <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Account Login</h3>
             </div>
-            <div class="college-card-body">
+            <div class="college-card-body">                {% if email_confirmation_needed %}
+                <div class="college-alert college-alert-warning mb-4">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    <span>
+                        Your email address needs to be verified before you can login. 
+                        Please check your inbox for <strong>{{ email }}</strong> and click the confirmation link.
+                    </span>                    <div class="mt-2">
+                        <form action="{{ url_for('resend_verification') }}" method="POST" class="inline">
+                            <input type="hidden" name="email" value="{{ email }}">
+                            <button type="submit" id="resendEmailBtn" 
+                                class="text-xs font-medium underline hover:text-indigo-700 dark:hover:text-indigo-300">
+                                Didn't get the email? Click here to resend
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+
                 <form method="POST" action="{{ url_for('login') }}" class="college-form space-y-6">
                     {{ form.csrf_token }}
                     
@@ -131,6 +148,18 @@
             easing: 'ease-in-out',
             once: true
         });
+        
+        // Handle email confirmation resend feedback
+        const resendForm = document.querySelector('form[action$="resend_verification"]');
+        if (resendForm) {
+            resendForm.addEventListener('submit', function() {
+                const resendBtn = this.querySelector('button');
+                if (resendBtn) {
+                    resendBtn.innerText = "Sending...";
+                    resendBtn.disabled = true;
+                }
+            });
+        }
     });
 </script>
 {% endblock %}
