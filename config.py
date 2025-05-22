@@ -54,7 +54,7 @@ class TestingConfig(Config):
     DEBUG = True
     WTF_CSRF_ENABLED = False
 
-# Dictionary to map environment names to config objects
+# Dictionary
 config = {
     'development': DevelopmentConfig,
     'production': ProductionConfig,

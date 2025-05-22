@@ -259,7 +259,8 @@
                     
                     {% if comments %}
                     <div class="space-y-4 mb-6">
-                        {% for comment in comments %}                <div class="comment-bubble flex space-x-2" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+                        {% for comment in comments %}                
+                        <div class="comment-bubble flex space-x-2" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
                             <div class="flex-shrink-0">
                                 <span class="comment-author-avatar inline-flex items-center justify-center h-8 w-8 rounded-full bg-indigo-500">
                                     <span class="text-sm font-medium leading-none text-white">

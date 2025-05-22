@@ -17,20 +17,20 @@ from supabase_utils import (
 from models import SupabaseUser
 import json
 
-# Initialize Flask app
+
 app = Flask(__name__)
 app.config.from_object(get_config())
 
-# Initialize Flask-Login
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 login_manager.login_message_category = 'info'
 
-# Ensure upload folder exists for temporary storage
+
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-# Helper Functions
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
@@ -45,7 +45,7 @@ def load_user(user_id):
         user_response = get_user(token)
         if not user_response or not user_response.get('user'):
             app.logger.warning("No user found in token response, session may be expired")
-            # Clear the invalid token
+            
             session.pop('access_token', None)
             return None
         
@@ -53,7 +53,7 @@ def load_user(user_id):
         return SupabaseUser(user_data)
     except Exception as e:
         app.logger.error(f"Error loading user: {str(e)}")
-        # Clear the invalid token on error
+        
         session.pop('access_token', None)
         return None
 
@@ -73,12 +73,12 @@ def login():
         try:
             app.logger.info(f"Attempting login for {form.email.data}")
             
-            # Sign in with Supabase Auth
+            
             response = sign_in_user(form.email.data, form.password.data)
             
             app.logger.info(f"Login response received: {response}")
             
-            # Check if there's an email confirmation error
+            
             if response.get('error') and response.get('email_confirmed') is False:
                 app.logger.warning(f"Email not confirmed for {form.email.data}")
                 flash('Please confirm your email address before logging in. Check your inbox for the confirmation link.', 'warning')
@@ -86,26 +86,26 @@ def login():
             
             if response and response.get('user'):
                 try:
-                    # Handle both dictionary and object response formats for session
+                    
                     session_token = None
                     
-                    # Get session data - might be a dictionary or object
+                    
                     session_data = response.get('session')
                     
-                    # Try to get the access token using different approaches
+                    
                     if session_data:
                         if isinstance(session_data, dict):
-                            # Dictionary approach
+                            
                             session_token = session_data.get('access_token')
                         elif hasattr(session_data, 'access_token'):
-                            # Object attribute approach
+                            
                             session_token = session_data.access_token
                             app.logger.info(f"Found access_token as attribute")
                         else:
-                            # Direct handling for any format
+                            
                             app.logger.info(f"Session data type: {type(session_data)}")
                             app.logger.info(f"Session data dir: {dir(session_data)}")
-                            # Try to convert to string or extract the token directly
+                            
                             if str(session_data) and 'token' in str(session_data).lower():
                                 app.logger.info(f"Raw session data: {str(session_data)}")
                     
@@ -115,21 +115,21 @@ def login():
                     else:
                         app.logger.warning("No access token found in response")
                     
-                    # Create user object from the response
+                    
                     user_data = None
                     user_obj = response.get('user')
                     
                     if isinstance(user_obj, dict):
                         user_data = user_obj
                     elif hasattr(user_obj, '__dict__'):
-                        # Try to convert object to dict
+                        
                         try:
                             user_data = vars(user_obj)
                         except:
                             pass
                     
                     if not user_data and hasattr(user_obj, 'id'):
-                        # Create minimal user data
+                        
                         user_data = {'id': user_obj.id, 'email': getattr(user_obj, 'email', form.email.data)}
                     
                     user = SupabaseUser(user_data)
@@ -137,7 +137,7 @@ def login():
                     
                     app.logger.info(f"User logged in: {user.email}")
                     
-                    # Redirect based on role
+                    
                     return redirect_based_on_role()
                     
                 except Exception as e:
@@ -147,11 +147,11 @@ def login():
                 app.logger.warning("Login failed - no user in response")
                 error_msg = "Login failed. "
                 
-                # If we have error details in the response
+                
                 if isinstance(response, dict) and response.get('error'):
                     error_msg = str(response.get('error'))
                     
-                    # Special handling for email confirmation errors
+                    
                     if "Email not confirmed" in error_msg:
                         flash('Please confirm your email address before logging in. Check your inbox for the confirmation link.', 'warning')
                         return render_template('login.html', form=form, email_confirmation_needed=True, email=form.email.data)                
@@ -193,19 +193,19 @@ def resend_verification():
         return redirect(url_for('login'))
     
     try:
-        # Use Supabase to resend the verification email
-        # This requires admin client permissions
+        
+        
         from supabase_utils import get_supabase_admin_client
         admin_client = get_supabase_admin_client()
         
-        # Use the admin.invite_user_by_email method if available
+        
         if hasattr(admin_client.auth, 'admin') and hasattr(admin_client.auth.admin, 'invite_user_by_email'):
             admin_client.auth.admin.invite_user_by_email(email)
             flash('Verification email has been resent. Please check your inbox.', 'success')
         else:
-            # Fallback - sign up the user again which will resend the verification
-            # This is less ideal but works in many cases
-            # We'd need the original password which we don't have, so we notify the user
+            
+            
+            
             flash('Please try registering again with the same email to receive a new verification link.', 'info')
         
     except Exception as e:
@@ -241,20 +241,20 @@ def register():
         try:
             app.logger.info("Starting user registration process")
             
-            # Create user in Supabase Auth
+            
             user_metadata = {
                 'name': form.name.data,
                 'role': form.role.data
             }
             
-            # Get the base URL for email redirect
+            
             base_url = request.host_url.rstrip('/')
             redirect_url = f"{base_url}/login"
             
             app.logger.info(f"Attempting to register: {form.email.data} with role: {form.role.data}")
             app.logger.info(f"Using redirect URL: {redirect_url}")
             
-            # The sign_up_user function now handles all errors internally and returns a consistent structure
+            
             response = sign_up_user(
                 form.email.data, 
                 form.password.data, 
@@ -264,14 +264,14 @@ def register():
             
             app.logger.info(f"Registration response received: {response}")
             
-            # Check if response contains user data
+            
             if response and response.get('user'):
                 app.logger.info("Registration successful")
                 flash('Registration successful! Please check your email to verify your account.', 'success')
                 return redirect(url_for('login'))
             else:
                 app.logger.warning("Registration failed - no user in response")
-                # Check logs for rate limit error message
+                
                 if "For security purposes, you can only request this after" in str(response):
                     flash('Too many attempts. Please wait for a minute before trying again.', 'warning')
                 else:
@@ -280,7 +280,7 @@ def register():
             error_msg = str(e)
             app.logger.error(f"Registration error: {error_msg}")
             
-            # Check for specific error messages and provide more helpful feedback
+            
             if "security purposes" in error_msg and "request this after" in error_msg:
                 flash('Too many registration attempts. Please wait for a minute before trying again.', 'warning')
             else:
@@ -306,25 +306,25 @@ def student_dashboard():
         return redirect(url_for('login'))
     
     try:
-        # Ensure we have a valid user ID
+        
         if not current_user.id:
             app.logger.error("No valid user ID found for student dashboard")
             flash('Your session appears to be invalid. Please login again.', 'danger')
             return redirect(url_for('logout'))
         
-        # Get all OD requests for the current user - use admin client to bypass RLS
+        
         from supabase_utils import get_supabase_admin_client
         admin_client = get_supabase_admin_client()
         response = admin_client.table('od_requests').select('*').eq('student_id', current_user.id).execute()
         od_requests = response.data
         
-        # Format dates for display
+        
         for req in od_requests:
-            # Format date if needed
+            
             if 'date' in req and req['date'] and 'T' in req['date']:
                 req['date'] = req['date'].split('T')[0]
                 
-            # Format created_at if needed
+            
             if 'created_at' in req and req['created_at'] and 'T' in req['created_at']:
                 req['created_at'] = req['created_at'].replace('T', ' ').split('.')[0]
     except Exception as e:
@@ -340,46 +340,46 @@ def teacher_dashboard():
     if not current_user.is_authenticated or not current_user.is_teacher():
         return redirect(url_for('login'))
     try:
-        # Get all OD requests to perform filtering client-side
+        
         from supabase_utils import get_supabase_admin_client
         admin_client = get_supabase_admin_client()
         
-        # Get all OD requests to perform filtering client-side
+        
         all_requests_response = admin_client.table('od_requests').select('*').execute()
         all_requests = all_requests_response.data
         
-        # Filter requests based on status and date
+        
         today = datetime.now().strftime("%Y-%m-%d")
         
-        # Filter pending requests for the dashboard display
+        
         od_requests = [req for req in all_requests if req['status'].lower() == 'pending']
         
-        # Format display dates for the dashboard
+        
         for req in od_requests:
-            # Fix student name/email if missing
+            
             if not req.get('student_name'):
                 req['student_name'] = req.get('student_email', 'Unknown Student')
             
-            # Format date if needed
+            
             if 'date' in req and req['date'] and 'T' in req['date']:
                 req['date'] = req['date'].split('T')[0]
                 
-            # Format created_at if needed
+            
             if 'created_at' in req and req['created_at'] and 'T' in req['created_at']:
                 req['created_at'] = req['created_at'].replace('T', ' ').split('.')[0]
                 
         pending_count = len(od_requests)
         
-        # Get today's requests (created today)
+        
         todays_requests = []
         for req in all_requests:
             created_at = req.get('created_at', '')
-            # Check if it starts with today's date (YYYY-MM-DD format)
+            
             if isinstance(created_at, str) and created_at.startswith(today):
                 todays_requests.append(req)
         todays_count = len(todays_requests)
         
-        # Get processed requests (approved or rejected)
+        
         processed_requests = [req for req in all_requests if req['status'].lower() != 'pending']
         total_actions = len(processed_requests)    
     except Exception as e:
@@ -406,27 +406,27 @@ def submit_od():
     form = ODRequestForm()
     if form.validate_on_submit():
         try:
-            # Upload document if provided
+            
             document_url = None
             if form.document.data:
                 file = form.document.data
                 filename = secure_filename(file.filename)
                 temp_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 
-                # Save temporarily to local filesystem
+                
                 file.save(temp_path)
                 
-                # Upload to Supabase Storage
+                
                 timestamp = int(time.time())
                 file_key = f"{current_user.id}_{timestamp}_{filename}"
                 upload_file('od-documents', temp_path, file_key)
                 
-                # Get public URL
+                
                 document_url = get_file_url('od-documents', file_key)
                 
-                # Remove temporary file
+                
                 os.remove(temp_path)
-              # Insert OD request record
+              
             od_data = {
                 'event_name': form.event_name.data,
                 'date': form.date.data.isoformat(),
@@ -439,13 +439,13 @@ def submit_od():
                 'created_at': datetime.now().isoformat()
             }
             
-            # Use admin client for insert to bypass row-level security
+            
             from supabase_utils import get_supabase_admin_client
             admin_client = get_supabase_admin_client()
             response = admin_client.table('od_requests').insert(od_data).execute()
             request_id = response.data[0]['id']
             
-            # Notify teachers
+            
             notify_teachers(current_user.name, form.event_name.data, request_id)
             
             flash('OD request submitted successfully!', 'success')
@@ -459,7 +459,7 @@ def submit_od():
 
 def notify_teachers(student_name, event_name, od_id):
     """Send email notifications to all teachers about a new OD request."""
-    try:        # Get all teachers from Supabase - use admin client to bypass RLS
+    try:        
         from supabase_utils import get_supabase_admin_client
         admin_client = get_supabase_admin_client()
         response = admin_client.table('teacher_notifications').select('*').execute()
@@ -469,7 +469,7 @@ def notify_teachers(student_name, event_name, od_id):
             app.logger.warning("No teachers found for notification")
             return
             
-        # Email setup
+        
         sender_email = app.config['MAIL_USERNAME']
         sender_password = app.config['MAIL_PASSWORD']
         
@@ -496,7 +496,7 @@ def notify_teachers(student_name, event_name, od_id):
             
             msg.attach(MIMEText(body, 'plain'))
             
-            # Send email
+            
             with smtplib.SMTP(app.config['MAIL_SERVER'], app.config['MAIL_PORT']) as server:
                 server.starttls()
                 server.login(sender_email, sender_password)
@@ -510,7 +510,7 @@ def notify_teachers(student_name, event_name, od_id):
 def view_request(request_id):
     """View OD request details."""
     try:
-        # Get OD request - use admin client to bypass RLS
+        
         from supabase_utils import get_supabase_admin_client
         admin_client = get_supabase_admin_client()
         od_response = admin_client.table('od_requests').select('*').eq('id', request_id).execute()
@@ -520,18 +520,18 @@ def view_request(request_id):
             flash('Request not found.', 'danger')
             return redirect_based_on_role()
             
-        # Check permissions        
+        
         if not current_user.is_teacher() and od_request['student_id'] != current_user.id:
             flash('You do not have permission to view this request.', 'danger')
             return redirect_based_on_role()
             
-        # Get comments - use admin client to bypass RLS
+        
         from supabase_utils import get_supabase_admin_client
         admin_client = get_supabase_admin_client()
         comments_response = admin_client.table('comments').select('*').eq('od_request_id', request_id).execute()
         comments = comments_response.data
         
-        # Create comment form
+        
         form = CommentForm()
         
         return render_template(
@@ -562,7 +562,7 @@ def add_comment(request_id):
                 'created_at': datetime.now().isoformat()
             }
             
-            # Use admin client to bypass RLS
+            
             from supabase_utils import get_supabase_admin_client
             admin_client = get_supabase_admin_client()
             admin_client.table('comments').insert(comment_data).execute()
@@ -583,7 +583,7 @@ def approve_od(od_id):
         return redirect(url_for('login'))
         
     try:
-        # Update OD request status - using admin client to bypass RLS
+        
         from supabase_utils import get_supabase_admin_client
         admin_client = get_supabase_admin_client()        
         admin_client.table('od_requests').update({
@@ -609,7 +609,7 @@ def reject_od(od_id):
         return redirect(url_for('login'))
         
     try:
-        # Update OD request status - using admin client to bypass RLS
+        
         from supabase_utils import get_supabase_admin_client
         admin_client = get_supabase_admin_client()        
         admin_client.table('od_requests').update({
