@@ -103,8 +103,8 @@
 {% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-100 dark:bg-gray-900 py-6" data-aos="fade-in">
-    <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+<div class="min-h-screen bg-gray-100 dark:bg-gray-900 py-4 pl-0" data-aos="fade-in">
+    <div class="max-w-3xl mx-auto px-2 sm:px-4">
         <!-- Request Banner -->
         <div class="request-header text-white p-6 rounded-t-lg shadow-lg" data-aos="fade-down">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between">
@@ -126,13 +126,12 @@
 
         <div class="bg-white dark:bg-gray-800 overflow-hidden rounded-b-lg shadow-lg" data-aos="fade-up" data-aos-delay="100">
             <!-- Student Info Section -->
-            <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                <div class="flex items-center">
-                    <div class="h-12 w-12 rounded-full bg-indigo-500 flex items-center justify-center text-white text-lg font-bold">
+            <div class="p-6 border-b border-gray-200 dark:border-gray-700">            <div class="flex items-center">
+                    <div class="h-10 w-10 rounded-full bg-indigo-500 flex items-center justify-center text-white text-lg font-bold">
                         {{ request.student_name[0] }}
                     </div>
-                    <div class="ml-4">
-                        <h2 class="text-lg font-bold text-gray-900 dark:text-white">{{ request.student_name }}</h2>                        <div class="text-sm text-gray-500 dark:text-gray-400 flex items-center">
+                    <div class="ml-3">
+                        <h2 class="text-lg font-bold text-gray-900 dark:text-white">{{ request.student_name }}</h2><div class="text-sm text-gray-500 dark:text-gray-400 flex items-center">
                             <i class="fas fa-envelope mr-1"></i> {{ request.email }}
                             <span class="mx-2">•</span>
                             <i class="fas fa-calendar-alt mr-1"></i> Submitted on {{ request.created_at }}
@@ -148,44 +147,37 @@
                         <i class="fas fa-info-circle mr-2 text-indigo-600 dark:text-indigo-400"></i>
                         Request Information
                     </h3>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="request-property p-4">
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="request-property p-3">
                             <div class="flex items-center mb-2">
                                 <i class="fas fa-calendar-day text-indigo-600 dark:text-indigo-400 mr-2"></i>
                                 <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Event Name</span>
                             </div>
-                            <div class="ml-6 text-base font-medium text-gray-900 dark:text-white">
+                            <div class="ml-4 text-base font-medium text-gray-900 dark:text-white">
                                 {{ request.event_name }}
                             </div>
-                        </div>
-
-                        <div class="request-property p-4">
+                        </div>                        <div class="request-property p-3">
                             <div class="flex items-center mb-2">
                                 <i class="fas fa-calendar-alt text-indigo-600 dark:text-indigo-400 mr-2"></i>
                                 <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Absence Date</span>
-                            </div>                            <div class="ml-6 text-base font-medium text-gray-900 dark:text-white">
+                            </div>                            <div class="ml-4 text-base font-medium text-gray-900 dark:text-white">
                                 {{ request.date }}
                             </div>
-                        </div>
-
-                        <div class="request-property p-4 md:col-span-2">
+                        </div>                        <div class="request-property p-3 md:col-span-2">
                             <div class="flex items-center mb-2">
                                 <i class="fas fa-align-left text-indigo-600 dark:text-indigo-400 mr-2"></i>
                                 <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Description</span>
                             </div>
-                            <div class="ml-6 text-base text-gray-900 dark:text-white">
+                            <div class="ml-4 text-base text-gray-900 dark:text-white">
                                 {{ request.description }}
                             </div>
-                        </div>
-
-                        {% if request.document_path %}
-                        <div class="request-property p-4 md:col-span-2">
+                        </div>                        {% if request.document_path %}
+                        <div class="request-property p-3 md:col-span-2">
                             <div class="flex items-center mb-2">
                                 <i class="fas fa-file-alt text-indigo-600 dark:text-indigo-400 mr-2"></i>
                                 <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Supporting Document</span>
                             </div>
-                            <div class="ml-6">
+                            <div class="ml-4">
                                 <a href="{{ url_for('static', filename='uploads/' + request.document_path) }}"
                                    class="document-preview flex items-center p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-indigo-50 dark:hover:bg-indigo-900 dark:hover:bg-opacity-20"
                                    target="_blank">
@@ -215,14 +207,16 @@
                     </h3>
                     
                     <div class="timeline-item">
-                        <div class="font-medium text-gray-900 dark:text-white">Request Submitted</div>                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                        <div class="font-medium text-gray-900 dark:text-white">Request Submitted</div>                        
+                        <div class="text-sm text-gray-500 dark:text-gray-400">
                             {{ request.created_at }}
                         </div>
                     </div>
                       <div class="timeline-item">
                         <div class="font-medium text-gray-900 dark:text-white">
                             Request {{ request.status }}
-                        </div>                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                        </div>                        
+                        <div class="text-sm text-gray-500 dark:text-gray-400">
                             {{ request.approved_at }}
                         </div>
                         <div class="mt-1 text-sm">
@@ -233,25 +227,22 @@
                 </div>
                 {% endif %}
 
-                {% if request.status == 'Pending' and current_user.role == 'teacher' %}
-                <div class="bg-indigo-50 dark:bg-indigo-900 dark:bg-opacity-20 p-6 rounded-lg mb-8">
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">
+                {% if request.status == 'Pending' and current_user.role == 'teacher' %}                <div class="bg-indigo-50 dark:bg-indigo-900 dark:bg-opacity-20 p-4 rounded-lg mb-6">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-3">
                         <i class="fas fa-user-check mr-2 text-indigo-600 dark:text-indigo-400"></i>
                         Faculty Decision
                     </h3>
                     <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
                         As a faculty member, you can approve or reject this request. Your decision will be recorded and communicated to the student.
-                    </p>
-                    <div class="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3">
+                    </p>                    <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2">
                         <form method="POST" action="{{ url_for('reject_od', od_id=request.id) }}" class="inline">
                             <button type="submit"
-                                    class="btn-college-danger w-full sm:w-auto inline-flex items-center justify-center px-6 py-3">
+                                    class="btn-college-danger w-full sm:w-auto inline-flex items-center justify-center px-4 py-2">
                                 <i class="fas fa-times mr-2"></i> Reject Request
                             </button>
-                        </form>
-                        <form method="POST" action="{{ url_for('approve_od', od_id=request.id) }}" class="inline">
+                        </form>                        <form method="POST" action="{{ url_for('approve_od', od_id=request.id) }}" class="inline">
                             <button type="submit"
-                                    class="btn-college-success w-full sm:w-auto inline-flex items-center justify-center px-6 py-3">
+                                    class="btn-college-success w-full sm:w-auto inline-flex items-center justify-center px-4 py-2">
                                 <i class="fas fa-check mr-2"></i> Approve Request
                             </button>
                         </form>
@@ -268,10 +259,9 @@
                     
                     {% if comments %}
                     <div class="space-y-4 mb-6">
-                        {% for comment in comments %}
-                        <div class="comment-bubble flex space-x-3" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+                        {% for comment in comments %}                <div class="comment-bubble flex space-x-2" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
                             <div class="flex-shrink-0">
-                                <span class="comment-author-avatar inline-flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500">
+                                <span class="comment-author-avatar inline-flex items-center justify-center h-8 w-8 rounded-full bg-indigo-500">
                                     <span class="text-sm font-medium leading-none text-white">
                                         {{ comment.author[0] }}
                                     </span>
