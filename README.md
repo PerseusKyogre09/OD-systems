@@ -5,7 +5,7 @@ This project is an Online OD (On-Duty) Management System built with Flask, Tailw
 ## Technologies Used
 
 - **Backend**: Flask (Python)
-- **Database**: MySQL
+- **Database**: MySQL, PostgreSQL with Supabase
 - **Frontend**: 
   - Tailwind CSS for styling
   - ScrollCue.js for animations
@@ -112,13 +112,42 @@ python app.py
 The system uses Gmail’s SMTP server for email notifications. Ensure you have enabled “less secure app access” in your Gmail account, or use an app-specific password if 2FA is enabled.
 
 ## Screenshots
-![S-1](https://imgur.com/tFOK8YE.png)
-![S-2](https://imgur.com/7vcri2D.png)
-![S-3](https://imgur.com/aGaX8pf.png)
-![S-4](https://imgur.com/6jPyBzd.png)
-![S-5](https://imgur.com/38HtozP.png)
-![S-6](https://imgur.com/LqvCIZG.png)
-![S-7](https://imgur.com/ptkbvx8.png)
+
+<div align="center">
+  <table>
+    <tr>
+      <td align="center">
+        <img src="https://i.imgur.com/mEvSPbg.jpeg" width="500px"><br>
+        <strong>Light Mode</strong>
+      </td>
+      <td align="center">
+        <img src="https://i.imgur.com/Bd7ZZXH.jpeg" width="500px"><br>
+        <strong>Dark Mode</strong>
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        <img src="https://i.imgur.com/j8Zwpm0.jpeg" width="500px"><br>
+        <strong>Sign In / Login</strong>
+      </td>
+      <td align="center">
+        <img src="https://i.imgur.com/eUG9wuh.jpeg" width="500px"><br>
+        <strong>Sign Up / Register</strong>
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        <img src="https://i.imgur.com/5bKKtbs.jpeg" width="500px"><br>
+        <strong>Student Dashboard</strong>
+      </td>
+      <td align="center">
+        <img src="https://i.imgur.com/rVxtKaj.jpeg" width="500px"><br>
+        <strong>Teacher Dashboard</strong>
+      </td>
+    </tr>
+  </table>
+</div>
+
 
 ## Security Considerations
 - Sensitive Data: Keep `.env` in `.gitignore` to avoid exposing sensitive data.
